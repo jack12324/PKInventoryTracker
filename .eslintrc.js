@@ -14,5 +14,6 @@ module.exports = {
   plugins: ["jest"],
   rules: {
     "import/no-extraneous-dependencies": "off",
+    "no-underscore-dangle": "off",
   },
 };
