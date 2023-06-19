@@ -1,3 +1,4 @@
+const { v4: uuid } = require("uuid");
 require("dotenv").config();
 
 const { PORT } = process.env;
@@ -11,7 +12,9 @@ const getDB = () => {
     case "dev":
       return process.env.MONGODB_URI_DEV;
     default:
-      return process.env.MONGODB_URI_TEST;
+      return `${
+        process.env.MONGODB_URI_BASE
+      }JT${uuid()}?retryWrites=true&w=majority`;
   }
 };
 

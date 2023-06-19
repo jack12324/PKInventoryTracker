@@ -20,7 +20,7 @@ beforeAll(async () => {
 
   const promises = Array.from(new Array(100), () => saveRandomUser());
   await Promise.all(promises);
-});
+}, 100000);
 
 describe("When some users already exist", () => {
   test.concurrent(
@@ -169,6 +169,6 @@ describe("When some users already exist", () => {
 });
 
 afterAll(async () => {
-  await User.deleteMany({});
+  await mongoose.connection.dropDatabase();
   await mongoose.connection.close();
 });
