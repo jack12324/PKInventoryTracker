@@ -12,9 +12,10 @@ const getDB = () => {
     case "dev":
       return process.env.MONGODB_URI_DEV;
     default:
-      return `${
-        process.env.MONGODB_URI_BASE
-      }JT${uuid()}?retryWrites=true&w=majority`;
+      return `${process.env.MONGODB_URI_BASE}JT${uuid().replace(
+        "-",
+        ""
+      )}?retryWrites=true&w=majority`;
   }
 };
 

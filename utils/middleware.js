@@ -17,8 +17,20 @@ const errorHandler = async (err, req, res, next) => {
       res.status(400).send({ error: "username must be at least 5 characters" });
     } else if (err.message.includes("Path `userName` is required")) {
       res.status(400).send({ error: "username is required" });
+    } else if (
+      err.message.includes("Path `name` is required") &&
+      err.message.includes("Cabinet validation failed")
+    ) {
+      res.status(400).send({ error: "name is required for cabinet" });
     } else {
       logger.error(`Unhandled Validation Error: ${err.message}`);
+      res.status(400).send({ error: err.message });
+    }
+  } else if (err.name === "JsonWebTokenError") {
+    if (err.message.includes("jwt malformed")) {
+      res.status(400).send({ error: "malformed token" });
+    } else {
+      logger.error(`Unhandled JsonWebToken Error: ${err.message}`);
       res.status(400).send({ error: err.message });
     }
   } else {

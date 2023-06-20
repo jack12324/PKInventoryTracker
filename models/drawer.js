@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const drawerSchema = new mongoose.Schema({
   name: {
     type: String,
+    default: "",
+  },
+  position: {
+    type: Number,
     required: true,
   },
   cabinet: {
