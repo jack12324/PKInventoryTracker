@@ -1,4 +1,6 @@
+const jwt = require("jsonwebtoken");
 const logger = require("./logger");
+const User = require("../models/user");
 
 const unknownEndpoint = async (req, res) => {
   res.status(404).send({ error: "Unknown Endpoint" });
@@ -17,11 +19,8 @@ const errorHandler = async (err, req, res, next) => {
       res.status(400).send({ error: "username must be at least 5 characters" });
     } else if (err.message.includes("Path `userName` is required")) {
       res.status(400).send({ error: "username is required" });
-    } else if (
-      err.message.includes("Path `name` is required") &&
-      err.message.includes("Cabinet validation failed")
-    ) {
-      res.status(400).send({ error: "name is required for cabinet" });
+    } else if (err.message.includes("Path `name` is required")) {
+      res.status(400).send({ error: "name is required" });
     } else {
       logger.error(`Unhandled Validation Error: ${err.message}`);
       res.status(400).send({ error: err.message });
@@ -40,4 +39,41 @@ const errorHandler = async (err, req, res, next) => {
   next(err);
 };
 
-module.exports = { unknownEndpoint, errorHandler };
+const extractToken = (req) => {
+  const auth = req.get("Authorization");
+  if (auth && auth.includes("Bearer ")) {
+    return auth.replace("Bearer ", "");
+  }
+  return null;
+};
+
+const userExtractor = async (req, res, next) => {
+  const token = extractToken(req);
+
+  if (!token) {
+    res.status(400).send({ error: "authorization token missing from request" });
+    return;
+  }
+
+  const tokenUser = jwt.verify(token, process.env.SECRET);
+
+  const user = await User.findById(tokenUser.id);
+
+  if (!user) {
+    res.status(401).send({ error: "user for provided token doesn't exist" });
+    return;
+  }
+  req.user = user;
+  next();
+};
+
+const requireAdmin = async (req, res, next) => {
+  const { user } = req;
+  if (!user.admin) {
+    res.status(401).send({ error: `user: ${user.userName} is not an admin` });
+    return;
+  }
+  next();
+};
+
+module.exports = { unknownEndpoint, errorHandler, userExtractor, requireAdmin };

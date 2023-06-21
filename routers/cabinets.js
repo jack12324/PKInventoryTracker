@@ -1,38 +1,9 @@
 const cabinetsRouter = require("express").Router();
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 const Cabinet = require("../models/cabinet");
 const Drawer = require("../models/drawer");
+const middleware = require("../utils/middleware");
 
-const extractToken = (req) => {
-  const auth = req.get("Authorization");
-  if (auth && auth.includes("Bearer ")) {
-    return auth.replace("Bearer ", "");
-  }
-  return null;
-};
-cabinetsRouter.post("/", async (req, res) => {
-  const token = extractToken(req);
-
-  if (!token) {
-    res.status(400).send({ error: "authorization token missing from request" });
-    return;
-  }
-
-  const tokenUser = jwt.verify(token, process.env.SECRET);
-
-  const user = await User.findById(tokenUser.id);
-
-  if (!user) {
-    res.status(401).send({ error: "user for provided token doesn't exist" });
-    return;
-  }
-
-  if (!user.admin) {
-    res.status(401).send({ error: `user: ${user.userName} is not an admin` });
-    return;
-  }
-
+cabinetsRouter.post("/", middleware.requireAdmin, async (req, res) => {
   const { name, numDrawers } = req.body;
 
   const newCabinet = new Cabinet({
@@ -53,6 +24,45 @@ cabinetsRouter.post("/", async (req, res) => {
   const addedCabinet = await newCabinet.save();
 
   res.status(201).json(addedCabinet);
+});
+
+cabinetsRouter.delete("/:id", middleware.requireAdmin, async (req, res) => {
+  const cabinet = await Cabinet.findById(req.params.id);
+
+  if (!cabinet) {
+    res.status(404).send({ error: "cabinet does not exist" });
+    return;
+  }
+
+  await Promise.all([
+    cabinet.deleteOne(),
+    ...cabinet.drawers.map((d) => Drawer.findByIdAndDelete(d)),
+  ]);
+  res.status(200).end();
+});
+
+cabinetsRouter.put("/:id", middleware.requireAdmin, async (req, res) => {
+  const cabinet = await Cabinet.findById(req.params.id);
+
+  if (!cabinet) {
+    res.status(404).send({ error: "cabinet does not exist" });
+    return;
+  }
+
+  const { name } = req.body || cabinet.name;
+
+  const updatedCabinet = await Cabinet.findByIdAndUpdate(
+    req.params.id,
+    { name },
+    { new: true, runValidators: true, context: "query" }
+  );
+
+  res.status(200).json(updatedCabinet);
+});
+
+cabinetsRouter.get("/", async (req, res) => {
+  const cabinets = await Cabinet.find();
+  res.status(200).json(cabinets);
 });
 
 module.exports = cabinetsRouter;

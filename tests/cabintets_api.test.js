@@ -11,8 +11,8 @@ const api = supertest(app);
 
 const originalUsers = helper.generateRandomUserData(50);
 beforeAll(async () => {
-  const promises = originalUsers.map((u) => new User(u).save());
-  await Promise.all(promises);
+  const userPromises = originalUsers.map((u) => new User(u).save());
+  await Promise.all(userPromises);
 }, 100000);
 
 describe("When some cabinets and users already exist", () => {
@@ -49,7 +49,6 @@ describe("When some cabinets and users already exist", () => {
           name: uuid(),
           numDrawers,
         };
-        const drawersBefore = await Drawer.find();
         const response = await api
           .post("/api/cabinets")
           .send(newCabinet)
@@ -65,8 +64,12 @@ describe("When some cabinets and users already exist", () => {
         expect(addedCabinet.name).toBe(newCabinet.name);
         expect(addedCabinet.drawers).toHaveLength(numDrawers);
 
-        const drawersAfter = await Drawer.find();
-        expect(drawersAfter).toHaveLength(drawersBefore.length + numDrawers);
+        const findDrawers = await Promise.all(
+          addedCabinet.drawers.map((d) => Drawer.findById(d))
+        );
+        findDrawers.forEach((d) => {
+          expect(d).toBeDefined();
+        });
       }
     );
     test.concurrent(
@@ -81,7 +84,7 @@ describe("When some cabinets and users already exist", () => {
           .expect(400)
           .expect("Content-Type", /application\/json/);
 
-        expect(response.body.error).toContain("name is required for cabinet");
+        expect(response.body.error).toContain("name is required");
 
         const addedCabinet = await Cabinet.findOne({ name: newCabinet.name });
         expect(addedCabinet).toBeNull();
@@ -169,6 +172,361 @@ describe("When some cabinets and users already exist", () => {
         expect(addedCabinet).toBeNull();
       }
     );
+  });
+  describe("When deleting a cabinet", () => {
+    test.concurrent(
+      "Succeeds with 200, deletes cabinet and any drawers within the cabinet",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5, 1);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+
+        await api
+          .delete(`/api/cabinets/${cabinet.id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(200);
+
+        const removedCabinet = await Cabinet.findOne({ name: cabinet.name });
+        expect(removedCabinet).toBeNull();
+        const foundDrawers = await Promise.all(
+          cabinet.drawers.map((d) => Drawer.findById(d))
+        );
+        foundDrawers.forEach((d) => {
+          expect(d).toBeNull();
+        });
+      }
+    );
+    test.concurrent(
+      "Without a token returns 400 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const response = await api
+          .delete(`/api/cabinets/${cabinet.id}`)
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain(
+          "authorization token missing from request"
+        );
+
+        const removedCabinet = await Cabinet.findOne({ name: cabinet.name });
+        expect(removedCabinet.name).toBe(cabinet.name);
+      }
+    );
+    test.concurrent(
+      "With a malformed token returns 400 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = "abadtokenwhichdoesntmakesense";
+
+        const response = await api
+          .delete(`/api/cabinets/${cabinet.id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("malformed token");
+
+        const removedCabinet = await Cabinet.findOne({ name: cabinet.name });
+        expect(removedCabinet.name).toBe(cabinet.name);
+      }
+    );
+    test.concurrent(
+      "With a id that doesn't exist returns 404 and a valid error message",
+      async () => {
+        const id = await helper.getNonExistingCabinetId();
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+        const response = await api
+          .delete(`/api/cabinets/${id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(404)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("cabinet does not exist");
+      }
+    );
+    test.concurrent(
+      "With a non-admin token returns 401 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = await helper.getRandomNonAdminTokenFrom(originalUsers);
+        const response = await api
+          .delete(`/api/cabinets/${cabinet.id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(401)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("is not an admin");
+
+        const removedCabinet = await Cabinet.findOne({ name: cabinet.name });
+        expect(removedCabinet.name).toBe(cabinet.name);
+      }
+    );
+  });
+  describe("changing a cabinet's", () => {
+    test.concurrent(
+      "name succeeds with 200 and returns updated cabinet",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+        const newName = uuid();
+
+        const response = await api
+          .put(`/api/cabinets/${cabinet._id}`)
+          .send({ name: newName })
+          .set("Authorization", `Bearer ${token}`)
+          .expect(200)
+          .expect("Content-Type", /application\/json/);
+
+        const updatedCabinet = await Cabinet.findById(cabinet._id);
+        expect(updatedCabinet.name).toBe(newName);
+
+        expect(response.body.name).toBe(newName);
+      }
+    );
+    test.concurrent(
+      "nothing (empty payload) returns 200 and doesn't update anything",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+
+        const response = await api
+          .put(`/api/cabinets/${cabinet._id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(200)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.name).toBe(cabinet.name);
+
+        const updatedCabinet = await Cabinet.findById(cabinet._id);
+        expect(updatedCabinet.name).toBe(cabinet.name);
+      }
+    );
+    test.concurrent(
+      "name with an empty name fails with 400 and doesn't update anything",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+
+        const response = await api
+          .put(`/api/cabinets/${cabinet._id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .send({ name: "" })
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("name is required");
+
+        const updatedCabinet = await Cabinet.findById(cabinet._id);
+        expect(updatedCabinet.name).toBe(cabinet.name);
+      }
+    );
+    test.concurrent(
+      "drawers returns 200 but doesn't actually update the drawers",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5, 1);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+
+        const response = await api
+          .put(`/api/cabinets/${cabinet._id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .send({ drawers: [] })
+          .expect(200)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.drawers).toHaveLength(cabinet.drawers.length);
+
+        const updatedCabinet = await Cabinet.findById(cabinet._id);
+        expect(updatedCabinet.drawers).toHaveLength(cabinet.drawers.length);
+      }
+    );
+    test.concurrent(
+      "Without a token returns 400 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const newName = uuid();
+        const response = await api
+          .put(`/api/cabinets/${cabinet._id}`)
+          .send({ name: newName })
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain(
+          "authorization token missing from request"
+        );
+
+        const updatedCabinet = await Cabinet.findById(cabinet._id);
+        expect(updatedCabinet.name).toBe(cabinet.name);
+      }
+    );
+    test.concurrent(
+      "With a malformed token returns 400 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = "abadtokenwhichdoesntmakesense";
+        const newName = uuid();
+
+        const response = await api
+          .put(`/api/cabinets/${cabinet._id}`)
+          .send({ name: newName })
+          .set("Authorization", `Bearer ${token}`)
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("malformed token");
+
+        const updatedCabinet = await Cabinet.findById(cabinet._id);
+        expect(updatedCabinet.name).toBe(cabinet.name);
+      }
+    );
+    test.concurrent(
+      "With a id that doesn't exist returns 404 and a valid error message",
+      async () => {
+        const id = await helper.getNonExistingCabinetId();
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+        const response = await api
+          .put(`/api/cabinets/${id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(404)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("cabinet does not exist");
+      }
+    );
+    test.concurrent(
+      "With a non-admin token returns 401 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const token = await helper.getRandomNonAdminTokenFrom(originalUsers);
+        const newName = uuid();
+
+        const response = await api
+          .put(`/api/cabinets/${cabinet._id}`)
+          .send({ name: newName })
+          .set("Authorization", `Bearer ${token}`)
+          .expect(401)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("is not an admin");
+
+        const updatedCabinet = await Cabinet.findById(cabinet._id);
+        expect(updatedCabinet.name).toBe(cabinet.name);
+      }
+    );
+  });
+  describe("getting cabinets", () => {
+    test.concurrent(
+      "Without a token returns 400 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const response = await api
+          .get("/api/cabinets")
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain(
+          "authorization token missing from request"
+        );
+      }
+    );
+    test.concurrent(
+      "With a malformed token returns 400 and a valid error message",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+        const token = "abadtokenwhichdoesntmakesense";
+
+        const response = await api
+          .get("/api/cabinets")
+          .set("Authorization", `Bearer ${token}`)
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain("malformed token");
+      }
+    );
+    test.concurrent(
+      "with an admin token succeeds with 200 and list of cabinets",
+      async () => {
+        const cabinets = helper.generateRandomCabinetData(5);
+        await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+        const response = await api
+          .get("/api/cabinets")
+          .set("Authorization", `Bearer ${token}`)
+          .expect(200)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body).toBeDefined();
+
+        response.body.forEach((c) => {
+          expect(c.drawers).toBeDefined();
+          expect(c.name).toBeDefined();
+          expect(c.__v).toBeUndefined();
+          expect(c._id).toBeUndefined();
+          expect(c.id).toBeDefined();
+        });
+
+        const returnedCabinetNames = response.body.map((c) => c.name);
+        cabinets.forEach((c) => {
+          expect(returnedCabinetNames).toContain(c.name);
+        });
+      }
+    );
+    test.concurrent("With a non-admin token succeeds", async () => {
+      const cabinets = helper.generateRandomCabinetData(5);
+      await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+
+      const token = await helper.getRandomNonAdminTokenFrom(originalUsers);
+      const response = await api
+        .get("/api/cabinets")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body).toBeDefined();
+
+      response.body.forEach((c) => {
+        expect(c.drawers).toBeDefined();
+        expect(c.name).toBeDefined();
+        expect(c.__v).toBeUndefined();
+        expect(c._id).toBeUndefined();
+        expect(c.id).toBeDefined();
+      });
+
+      const returnedCabinetNames = response.body.map((c) => c.name);
+      cabinets.forEach((c) => {
+        expect(returnedCabinetNames).toContain(c.name);
+      });
+    });
   });
 });
 

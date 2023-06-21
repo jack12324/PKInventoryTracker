@@ -22,7 +22,7 @@ mongoose
 
 app.use(express.json());
 app.use("/api/users", usersRouter);
-app.use("/api/cabinets", cabinetsRouter);
+app.use("/api/cabinets", middleware.userExtractor, cabinetsRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
