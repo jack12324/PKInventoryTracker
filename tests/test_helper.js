@@ -3,6 +3,7 @@ const { v4: uuid } = require("uuid");
 const User = require("../models/user");
 const Cabinet = require("../models/cabinet");
 const Drawer = require("../models/drawer");
+const Item = require("../models/item");
 
 const getTokenForUser = (user) => {
   const userForToken = {
@@ -63,6 +64,17 @@ const getNonExistingCabinetId = async () => {
   await cabinet.deleteOne();
   return cabinet._id.toString();
 };
+
+const getNonExistingDrawerId = async () => {
+  const cabinet = await new Cabinet({ name: uuid() }).save();
+  const drawer = await new Drawer({
+    name: uuid(),
+    position: 0,
+    cabinet: cabinet._id,
+  }).save();
+  await Promise.all([drawer.deleteOne(), cabinet.deleteOne()]);
+  return drawer._id.toString();
+};
 const generateDrawersForCabinet = (cabinet, numDrawers) =>
   numDrawers > 0
     ? Array.from(
@@ -71,14 +83,36 @@ const generateDrawersForCabinet = (cabinet, numDrawers) =>
       )
     : [];
 
-const generateDrawersFromCabinets = (cabinets) =>
-  cabinets.flatMap((c) => generateDrawersForCabinet(c));
-
+const generateItemsForDrawer = (drawer, numItems) =>
+  numItems > 0
+    ? Array.from(
+        new Array(numItems),
+        () => new Item({ name: uuid(), drawer: drawer._id })
+      )
+    : [];
+const populateDrawer = async (drawer) => {
+  const items = generateItemsForDrawer(
+    drawer,
+    Math.floor(Math.random() * 5) + 1
+  );
+  // eslint-disable-next-line no-param-reassign
+  drawer.items = items.map((i) => i._id);
+  return Promise.all([drawer.save(), ...items.map((i) => i.save())]);
+};
 const populateCabinet = async (cabinetData) => {
   const cabinet = new Cabinet({ name: cabinetData.name });
   const drawers = generateDrawersForCabinet(cabinet, cabinetData.numDrawers);
   cabinet.drawers = drawers.map((d) => d._id);
-  return Promise.all([cabinet.save(), ...drawers.map((d) => d.save())]);
+  const fullDrawers = drawers.map((d) => populateDrawer(d));
+  return Promise.all([cabinet.save(), ...fullDrawers]);
+};
+
+const getRandomDrawerFromCabinets = async (cabinets) => {
+  const cabinetData = cabinets[Math.floor(Math.random() * cabinets.length)];
+  const cabinet = await Cabinet.findOne({ name: cabinetData.name });
+  return Drawer.findById(
+    cabinet.drawers[Math.floor(Math.random() * cabinet.drawers.length)]
+  );
 };
 
 module.exports = {
@@ -91,6 +125,7 @@ module.exports = {
   generateRandomCabinetData,
   getRandomCabinetFrom,
   getNonExistingCabinetId,
-  generateDrawersFromCabinets,
+  getNonExistingDrawerId,
   populateCabinet,
+  getRandomDrawerFromCabinets,
 };

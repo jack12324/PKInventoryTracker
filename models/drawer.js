@@ -25,6 +25,7 @@ drawerSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     const editable = returnedObject;
     editable.id = returnedObject._id.toString();
+    editable.cabinet = returnedObject.cabinet.toString();
     delete editable._id;
     delete editable.__v;
   },

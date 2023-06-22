@@ -5,6 +5,7 @@ const logger = require("./utils/logger");
 const config = require("./utils/config");
 const usersRouter = require("./routers/users");
 const cabinetsRouter = require("./routers/cabinets");
+const drawersRouter = require("./routers/drawers");
 const middleware = require("./utils/middleware");
 
 const app = express();
@@ -23,6 +24,7 @@ mongoose
 app.use(express.json());
 app.use("/api/users", usersRouter);
 app.use("/api/cabinets", middleware.userExtractor, cabinetsRouter);
+app.use("/api/drawers", middleware.userExtractor, drawersRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);

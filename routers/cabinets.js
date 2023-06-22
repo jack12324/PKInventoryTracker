@@ -62,6 +62,7 @@ cabinetsRouter.put("/:id", middleware.requireAdmin, async (req, res) => {
 
 cabinetsRouter.get("/", async (req, res) => {
   const cabinets = await Cabinet.find();
+
   res.status(200).json(cabinets);
 });
 

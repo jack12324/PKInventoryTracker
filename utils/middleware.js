@@ -21,6 +21,10 @@ const errorHandler = async (err, req, res, next) => {
       res.status(400).send({ error: "username is required" });
     } else if (err.message.includes("Path `name` is required")) {
       res.status(400).send({ error: "name is required" });
+    } else if (err.message.includes("Path `cabinet` is required")) {
+      res.status(400).send({ error: "cabinet is required" });
+    } else if (err.message.includes("Path `position` is required")) {
+      res.status(400).send({ error: "position is required" });
     } else {
       logger.error(`Unhandled Validation Error: ${err.message}`);
       res.status(400).send({ error: err.message });
