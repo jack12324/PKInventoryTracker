@@ -115,6 +115,12 @@ const getRandomDrawerFromCabinets = async (cabinets) => {
   );
 };
 
+const setupAndGetDrawerForTest = async (numCabinets = 2) => {
+  const cabinets = generateRandomCabinetData(numCabinets, 1);
+  await Promise.all(cabinets.map((c) => populateCabinet(c)));
+  return getRandomDrawerFromCabinets(cabinets);
+};
+
 module.exports = {
   getTokenForUser,
   getInvalidToken,
@@ -128,4 +134,5 @@ module.exports = {
   getNonExistingDrawerId,
   populateCabinet,
   getRandomDrawerFromCabinets,
+  setupAndGetDrawerForTest,
 };

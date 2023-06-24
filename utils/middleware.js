@@ -36,6 +36,27 @@ const errorHandler = async (err, req, res, next) => {
       logger.error(`Unhandled JsonWebToken Error: ${err.message}`);
       res.status(400).send({ error: err.message });
     }
+  } else if (err.name === "CastError") {
+    if (err.message.includes('at path "position"')) {
+      res.status(400).send({ error: "position must be a number" });
+    } else if (
+      err.message.includes("Cast to ObjectId") &&
+      err.message.includes("Cabinet")
+    ) {
+      res
+        .status(404)
+        .send({ error: "provided objectId for cabinet doesn't exist" });
+    } else if (
+      err.message.includes("Cast to ObjectId") &&
+      err.message.includes("Drawer")
+    ) {
+      res
+        .status(404)
+        .send({ error: "provided objectId for drawer doesn't exist" });
+    } else {
+      logger.error(`Unhandled Cast Error: ${err.message}`);
+      res.status(400).send({ error: err.message });
+    }
   } else {
     logger.error(`Unhandled Error: ${err}`);
     res.status(500).send({ error: err });

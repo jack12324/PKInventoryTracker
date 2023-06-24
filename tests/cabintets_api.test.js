@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const Cabinet = require("../models/cabinet");
 const Drawer = require("../models/drawer");
+const Item = require("../models/item");
 const app = require("../app");
 const helper = require("./test_helper");
 
@@ -175,12 +176,15 @@ describe("When some cabinets and users already exist", () => {
   });
   describe("When deleting a cabinet", () => {
     test.concurrent(
-      "Succeeds with 200, deletes cabinet and any drawers within the cabinet",
+      "Succeeds with 200, deletes cabinet and any drawers within the cabinet, and any items within those drawers",
       async () => {
         const cabinets = helper.generateRandomCabinetData(5, 1);
         await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
 
         const cabinet = await helper.getRandomCabinetFrom(cabinets);
+        const drawers = await Promise.all(
+          cabinet.drawers.map((d) => Drawer.findById(d))
+        );
         const token = await helper.getRandomAdminTokenFrom(originalUsers);
 
         await api
@@ -196,6 +200,11 @@ describe("When some cabinets and users already exist", () => {
         foundDrawers.forEach((d) => {
           expect(d).toBeNull();
         });
+
+        const foundItems = await Promise.all(
+          drawers.flatMap((d) => d.items.map((i) => Item.findById(i)))
+        );
+        foundItems.forEach((i) => expect(i).toBeNull());
       }
     );
     test.concurrent(
@@ -249,6 +258,21 @@ describe("When some cabinets and users already exist", () => {
           .expect("Content-Type", /application\/json/);
 
         expect(response.body.error).toContain("cabinet does not exist");
+      }
+    );
+    test.concurrent(
+      "With a bad id returns 404 and a valid error message",
+      async () => {
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+        const response = await api
+          .delete(`/api/cabinets/lkjiejek`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(404)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain(
+          "provided objectId for cabinet doesn't exist"
+        );
       }
     );
     test.concurrent(
@@ -415,6 +439,21 @@ describe("When some cabinets and users already exist", () => {
           .expect("Content-Type", /application\/json/);
 
         expect(response.body.error).toContain("cabinet does not exist");
+      }
+    );
+    test.concurrent(
+      "With a bad id returns 404 and a valid error message",
+      async () => {
+        const token = await helper.getRandomAdminTokenFrom(originalUsers);
+        const response = await api
+          .put(`/api/cabinets/lkjiejek`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(404)
+          .expect("Content-Type", /application\/json/);
+
+        expect(response.body.error).toContain(
+          "provided objectId for cabinet doesn't exist"
+        );
       }
     );
     test.concurrent(

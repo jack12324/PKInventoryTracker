@@ -1,6 +1,7 @@
 const cabinetsRouter = require("express").Router();
 const Cabinet = require("../models/cabinet");
 const Drawer = require("../models/drawer");
+const Item = require("../models/item");
 const middleware = require("../utils/middleware");
 
 cabinetsRouter.post("/", middleware.requireAdmin, async (req, res) => {
@@ -34,9 +35,14 @@ cabinetsRouter.delete("/:id", middleware.requireAdmin, async (req, res) => {
     return;
   }
 
+  const drawers = await Promise.all(
+    cabinet.drawers.map((d) => Drawer.findById(d))
+  );
+
   await Promise.all([
     cabinet.deleteOne(),
-    ...cabinet.drawers.map((d) => Drawer.findByIdAndDelete(d)),
+    ...drawers.map((d) => d.deleteOne()),
+    ...drawers.flatMap((d) => d.items.map((i) => Item.findByIdAndDelete(i))),
   ]);
   res.status(200).end();
 });
