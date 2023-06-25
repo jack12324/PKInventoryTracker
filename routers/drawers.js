@@ -56,6 +56,7 @@ drawersRouter.put("/:id", middleware.requireAdmin, async (req, res) => {
 
   if (!drawer) {
     res.status(404).send({ error: "drawer does not exist" });
+    return;
   }
 
   const updatedDrawer = Drawer.findByIdAndUpdate(

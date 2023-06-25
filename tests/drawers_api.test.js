@@ -138,7 +138,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
           "authorization token missing from request"
         );
 
-        const addedDrawer = await Cabinet.findOne({ name: newDrawer.name });
+        const addedDrawer = await Drawer.findOne({ name: newDrawer.name });
         expect(addedDrawer).toBeNull();
       }
     );
@@ -158,7 +158,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
 
         expect(response.body.error).toContain("malformed token");
 
-        const addedDrawer = await Cabinet.findOne({ name: newDrawer.name });
+        const addedDrawer = await Drawer.findOne({ name: newDrawer.name });
         expect(addedDrawer).toBeNull();
       }
     );
@@ -180,7 +180,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
           "user for provided token doesn't exist"
         );
 
-        const addedDrawer = await Cabinet.findOne({ name: newDrawer.name });
+        const addedDrawer = await Drawer.findOne({ name: newDrawer.name });
         expect(addedDrawer).toBeNull();
       }
     );
@@ -200,7 +200,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
 
         expect(response.body.error).toContain("is not an admin");
 
-        const addedDrawer = await Cabinet.findOne({ name: newDrawer.name });
+        const addedDrawer = await Drawer.findOne({ name: newDrawer.name });
         expect(addedDrawer).toBeNull();
       }
     );
@@ -283,7 +283,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
       async () => {
         const token = await helper.getRandomAdminTokenFrom(originalUsers);
         const response = await api
-          .put(`/api/drawers/lkjiejek`)
+          .delete(`/api/drawers/lkjiejek`)
           .set("Authorization", `Bearer ${token}`)
           .expect(404)
           .expect("Content-Type", /application\/json/);

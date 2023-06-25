@@ -75,6 +75,22 @@ const getNonExistingDrawerId = async () => {
   await Promise.all([drawer.deleteOne(), cabinet.deleteOne()]);
   return drawer._id.toString();
 };
+
+const getNonExistingItemId = async () => {
+  const cabinet = await new Cabinet({ name: uuid() }).save();
+  const drawer = await new Drawer({
+    name: uuid(),
+    position: 0,
+    cabinet: cabinet._id,
+  }).save();
+  const item = await new Item({ name: uuid(), drawer: drawer._id }).save();
+  await Promise.all([
+    drawer.deleteOne(),
+    cabinet.deleteOne(),
+    item.deleteOne(),
+  ]);
+  return item._id.toString();
+};
 const generateDrawersForCabinet = (cabinet, numDrawers) =>
   numDrawers > 0
     ? Array.from(
@@ -121,6 +137,13 @@ const setupAndGetDrawerForTest = async (numCabinets = 2) => {
   return getRandomDrawerFromCabinets(cabinets);
 };
 
+const setupAndGetItemForTest = async (numCabinets = 2) => {
+  const drawer = await setupAndGetDrawerForTest(numCabinets);
+  return Item.findById(
+    drawer.items[Math.floor(Math.random() * drawer.items.length)]
+  );
+};
+
 module.exports = {
   getTokenForUser,
   getInvalidToken,
@@ -132,7 +155,9 @@ module.exports = {
   getRandomCabinetFrom,
   getNonExistingCabinetId,
   getNonExistingDrawerId,
+  getNonExistingItemId,
   populateCabinet,
   getRandomDrawerFromCabinets,
   setupAndGetDrawerForTest,
+  setupAndGetItemForTest,
 };

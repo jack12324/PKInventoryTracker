@@ -53,6 +53,13 @@ const errorHandler = async (err, req, res, next) => {
       res
         .status(404)
         .send({ error: "provided objectId for drawer doesn't exist" });
+    } else if (
+      err.message.includes("Cast to ObjectId") &&
+      err.message.includes("Item")
+    ) {
+      res
+        .status(404)
+        .send({ error: "provided objectId for item doesn't exist" });
     } else {
       logger.error(`Unhandled Cast Error: ${err.message}`);
       res.status(400).send({ error: err.message });
