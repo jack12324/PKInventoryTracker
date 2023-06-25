@@ -9,7 +9,7 @@
     "test": "cross-env NODE_ENV=test jest --verbose"
   },
   "jest": {
-    "maxConcurrency": 3
+    "maxConcurrency": 10
   },
   "author": "Jack Porter",
   "license": "ISC",
