@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
 usersRouter.post("/", async (req, res) => {
-  const { password, userName } = req.body;
+  const { password, username } = req.body;
 
   if (!password) {
     res.status(400).send({ error: "password is required" });
@@ -19,7 +19,7 @@ usersRouter.post("/", async (req, res) => {
   const passwordHash = await bcrypt.hash(password, saltRounds);
 
   const newUser = User({
-    userName,
+    username,
     passwordHash,
     admin: false,
   });

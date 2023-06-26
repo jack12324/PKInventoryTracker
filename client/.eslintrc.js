@@ -10,9 +10,10 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  plugins: ["react"],
+  plugins: ["react", "import"],
   rules: {
     "react/jsx-filename-extension": "off",
     "react/react-in-jsx-scope": "off",
+    "import/no-extraneous-dependencies": "off",
   },
 };

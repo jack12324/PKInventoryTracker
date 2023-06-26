@@ -4,10 +4,10 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
 loginRouter.post("/", async (req, res) => {
-  const { userName, password } = req.body;
+  const { username, password } = req.body;
 
-  if (!userName) {
-    res.status(400).send({ error: "userName is required" });
+  if (!username) {
+    res.status(400).send({ error: "username is required" });
     return;
   }
   if (!password) {
@@ -15,7 +15,7 @@ loginRouter.post("/", async (req, res) => {
     return;
   }
 
-  const user = await User.findOne({ userName });
+  const user = await User.findOne({ username });
 
   if (!user) {
     res.status(404).send({ error: "user doesn't exist" });
@@ -30,12 +30,12 @@ loginRouter.post("/", async (req, res) => {
   }
 
   const token = jwt.sign(
-    { userName: user.userName, id: user._id },
+    { username: user.username, id: user._id },
     process.env.SECRET,
     { expiresIn: "12h" }
   );
 
-  res.status(200).send({ token, userName: user.userName });
+  res.status(200).send({ token, username: user.username });
 });
 
 module.exports = loginRouter;

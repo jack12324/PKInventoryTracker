@@ -8,7 +8,7 @@ const api = supertest(app);
 
 beforeAll(async () => {
   const generateUser = () => ({
-    userName: uuid(),
+    username: uuid(),
     passwordHash: uuid(),
     admin: Math.random() > 0.5,
   });
@@ -27,7 +27,7 @@ describe("When some users already exist", () => {
     "Adding a user succeeds with 200 and returns added user as json",
     async () => {
       const newUser = {
-        userName: uuid(),
+        username: uuid(),
         password: uuid(),
       };
 
@@ -37,7 +37,7 @@ describe("When some users already exist", () => {
         .expect(200)
         .expect("Content-Type", /application\/json/);
 
-      expect(response.body.userName).toBe(newUser.userName);
+      expect(response.body.username).toBe(newUser.username);
       expect(response.body.password).toBeUndefined();
       expect(response.body.passwordHash).toBeUndefined();
       expect(response.body.admin).toBe(false);
@@ -45,7 +45,7 @@ describe("When some users already exist", () => {
       expect(response.body.__v).toBeUndefined();
       expect(response.body.id).toBeDefined();
 
-      const addedUser = await User.findOne({ userName: newUser.userName });
+      const addedUser = await User.findOne({ username: newUser.username });
       expect(addedUser).toBeDefined();
       expect(addedUser.passwordHash).toBeDefined();
       expect(addedUser.passwordHash).not.toBe(newUser.password);
@@ -60,7 +60,7 @@ describe("When some users already exist", () => {
         allUsers[Math.floor(Math.random() * allUsers.length)];
 
       const newUser = {
-        userName: existingUser.userName,
+        username: existingUser.username,
         password: uuid(),
       };
 
@@ -77,7 +77,7 @@ describe("When some users already exist", () => {
     "Adding a user with a username that is too short fails with 400 and appropriate error message as json",
     async () => {
       const newUser = {
-        userName: uuid().slice(0, 4),
+        username: uuid().slice(0, 4),
         password: uuid(),
       };
 
@@ -112,7 +112,7 @@ describe("When some users already exist", () => {
     "Adding a user with a password that is too short fails with 400 and appropriate error message as json",
     async () => {
       const newUser = {
-        userName: uuid(),
+        username: uuid(),
         password: uuid().slice(0, 7),
       };
 
@@ -131,7 +131,7 @@ describe("When some users already exist", () => {
     "Adding a user without a password fails with 400 and appropriate error message as json",
     async () => {
       const newUser = {
-        userName: uuid(),
+        username: uuid(),
       };
 
       const response = await api
@@ -147,7 +147,7 @@ describe("When some users already exist", () => {
     "Adding a user with the admin field set to true overrides this value and sets it to false",
     async () => {
       const newUser = {
-        userName: uuid(),
+        username: uuid(),
         password: uuid(),
         admin: true,
       };
@@ -158,10 +158,10 @@ describe("When some users already exist", () => {
         .expect(200)
         .expect("Content-Type", /application\/json/);
 
-      expect(response.body.userName).toBe(newUser.userName);
+      expect(response.body.username).toBe(newUser.username);
       expect(response.body.admin).toBe(false);
 
-      const addedUser = await User.findOne({ userName: newUser.userName });
+      const addedUser = await User.findOne({ username: newUser.username });
       expect(addedUser).toBeDefined();
       expect(addedUser.admin).toBe(false);
     }

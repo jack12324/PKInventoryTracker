@@ -10,14 +10,14 @@ const errorHandler = async (err, req, res, next) => {
   logger.info(`${err.name} ${err.message}`);
 
   if (err.name === "ValidationError") {
-    if (err.message.includes("expected `userName` to be unique")) {
+    if (err.message.includes("expected `username` to be unique")) {
       res.status(400).send({ error: "username must be unique" });
     } else if (
-      err.message.includes("userName") &&
+      err.message.includes("username") &&
       err.message.includes("is shorter than the minimum")
     ) {
       res.status(400).send({ error: "username must be at least 5 characters" });
-    } else if (err.message.includes("Path `userName` is required")) {
+    } else if (err.message.includes("Path `username` is required")) {
       res.status(400).send({ error: "username is required" });
     } else if (err.message.includes("Path `name` is required")) {
       res.status(400).send({ error: "name is required" });
@@ -102,7 +102,7 @@ const userExtractor = async (req, res, next) => {
 const requireAdmin = async (req, res, next) => {
   const { user } = req;
   if (!user.admin) {
-    res.status(403).send({ error: `user: ${user.userName} is not an admin` });
+    res.status(403).send({ error: `user: ${user.username} is not an admin` });
     return;
   }
   next();

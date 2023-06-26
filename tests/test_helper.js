@@ -8,7 +8,7 @@ const Item = require("../models/item");
 
 const getTokenForUser = (user) => {
   const userForToken = {
-    userName: user.userName,
+    username: user.username,
     id: user._id,
   };
   return jwt.sign(userForToken, process.env.SECRET);
@@ -18,7 +18,7 @@ const generateUser = async (userData) => {
   const numSalts = 10;
   const passwordHash = await bcrypt.hash(userData.password, numSalts);
   return new User({
-    userName: userData.userName,
+    username: userData.username,
     passwordHash,
     admin: userData.admin,
   }).save();
@@ -26,7 +26,7 @@ const generateUser = async (userData) => {
 
 const generateRandomUserData = (count) =>
   Array.from(new Array(count), () => ({
-    userName: uuid(),
+    username: uuid(),
     passwordHash: uuid(),
     admin: Math.random() > 0.5,
   }));
@@ -34,7 +34,7 @@ const generateRandomUserData = (count) =>
 const getRandomUserOf = async (users, filter = () => true) => {
   const filtered = users.filter(filter);
   const userData = filtered[Math.floor(Math.random() * filtered.length)];
-  return User.findOne({ userName: userData.userName });
+  return User.findOne({ username: userData.username });
 };
 
 const getRandomAdminTokenFrom = async (users) => {
@@ -49,7 +49,7 @@ const getRandomNonAdminTokenFrom = async (users) => {
 
 const getInvalidToken = async () => {
   const user = new User({
-    userName: uuid(),
+    username: uuid(),
     admin: true,
     passwordHash: "LJSDF",
   });

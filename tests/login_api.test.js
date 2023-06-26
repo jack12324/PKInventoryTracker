@@ -7,7 +7,7 @@ const helper = require("./test_helper");
 const api = supertest(app);
 
 const existingUser = {
-  userName: uuid(),
+  username: uuid(),
   admin: Math.random() > 0.5,
   password: uuid(),
 };
@@ -18,7 +18,7 @@ beforeAll(async () => {
 describe("When some users exist, logging in with", () => {
   test("valid credentials succeeds with 200, and returns a json payload with a token and a username", async () => {
     const credentials = {
-      userName: existingUser.userName,
+      username: existingUser.username,
       password: existingUser.password,
     };
 
@@ -29,7 +29,7 @@ describe("When some users exist, logging in with", () => {
       .expect("Content-Type", /application\/json/);
 
     expect(response.body.token).toBeDefined();
-    expect(response.body.userName).toEqual(credentials.userName);
+    expect(response.body.username).toEqual(credentials.username);
   });
 
   test("a missing username returns 400 and error message", async () => {
@@ -43,11 +43,11 @@ describe("When some users exist, logging in with", () => {
       .expect(400)
       .expect("Content-Type", /application\/json/);
 
-    expect(response.body.error).toEqual("userName is required");
+    expect(response.body.error).toEqual("username is required");
   });
   test("a missing password returns 400 and error message", async () => {
     const credentials = {
-      userName: existingUser.userName,
+      username: existingUser.username,
     };
 
     const response = await api
@@ -60,7 +60,7 @@ describe("When some users exist, logging in with", () => {
   });
   test("an invalid password returns 422 and error message", async () => {
     const credentials = {
-      userName: existingUser.userName,
+      username: existingUser.username,
       password: "wrongpassword",
     };
 
@@ -74,7 +74,7 @@ describe("When some users exist, logging in with", () => {
   });
   test("a non-existing user returns 404 and error message", async () => {
     const removedUser = {
-      userName: uuid(),
+      username: uuid(),
       admin: Math.random() > 0.5,
       password: uuid(),
     };
@@ -83,7 +83,7 @@ describe("When some users exist, logging in with", () => {
     await savedUser.deleteOne();
 
     const credentials = {
-      userName: removedUser.userName,
+      username: removedUser.username,
       password: removedUser.password,
     };
 
