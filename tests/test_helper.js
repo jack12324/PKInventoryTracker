@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { v4: uuid } = require("uuid");
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const Cabinet = require("../models/cabinet");
 const Drawer = require("../models/drawer");
@@ -11,6 +12,16 @@ const getTokenForUser = (user) => {
     id: user._id,
   };
   return jwt.sign(userForToken, process.env.SECRET);
+};
+
+const generateUser = async (userData) => {
+  const numSalts = 10;
+  const passwordHash = await bcrypt.hash(userData.password, numSalts);
+  return new User({
+    userName: userData.userName,
+    passwordHash,
+    admin: userData.admin,
+  }).save();
 };
 
 const generateRandomUserData = (count) =>
@@ -160,4 +171,5 @@ module.exports = {
   getRandomDrawerFromCabinets,
   setupAndGetDrawerForTest,
   setupAndGetItemForTest,
+  generateUser,
 };

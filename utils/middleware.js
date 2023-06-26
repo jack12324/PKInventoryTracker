@@ -83,7 +83,7 @@ const userExtractor = async (req, res, next) => {
   const token = extractToken(req);
 
   if (!token) {
-    res.status(400).send({ error: "authorization token missing from request" });
+    res.status(401).send({ error: "authorization token missing from request" });
     return;
   }
 
@@ -92,7 +92,7 @@ const userExtractor = async (req, res, next) => {
   const user = await User.findById(tokenUser.id);
 
   if (!user) {
-    res.status(401).send({ error: "user for provided token doesn't exist" });
+    res.status(404).send({ error: "user for provided token doesn't exist" });
     return;
   }
   req.user = user;
@@ -102,7 +102,7 @@ const userExtractor = async (req, res, next) => {
 const requireAdmin = async (req, res, next) => {
   const { user } = req;
   if (!user.admin) {
-    res.status(401).send({ error: `user: ${user.userName} is not an admin` });
+    res.status(403).send({ error: `user: ${user.userName} is not an admin` });
     return;
   }
   next();

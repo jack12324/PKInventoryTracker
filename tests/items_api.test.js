@@ -124,14 +124,14 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const addedItem = await Item.findOne({ name: newItem.name });
       expect(addedItem).toBeNull();
     });
-    test("Without a token returns 400 and a valid error message", async () => {
+    test("Without a token returns 401 and a valid error message", async () => {
       const newItem = {
         name: uuid(),
       };
       const response = await api
         .post("/api/items")
         .send(newItem)
-        .expect(400)
+        .expect(401)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain(
@@ -158,7 +158,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const addedItem = await Item.findOne({ name: newItem.name });
       expect(addedItem).toBeNull();
     });
-    test("With a token for a deleted user returns 401 and a valid error message", async () => {
+    test("With a token for a deleted user returns 404 and a valid error message", async () => {
       const newItem = {
         name: uuid(),
       };
@@ -167,7 +167,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
         .post("/api/items")
         .send(newItem)
         .set("Authorization", `Bearer ${token}`)
-        .expect(401)
+        .expect(404)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain(
@@ -177,7 +177,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const addedItem = await Item.findOne({ name: newItem.name });
       expect(addedItem).toBeNull();
     });
-    test("With a non-admin token returns 401 and a valid error message", async () => {
+    test("With a non-admin token returns 403 and a valid error message", async () => {
       const token = await helper.getRandomNonAdminTokenFrom(originalUsers);
       const newItem = {
         name: uuid(),
@@ -186,7 +186,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
         .post("/api/items")
         .send(newItem)
         .set("Authorization", `Bearer ${token}`)
-        .expect(401)
+        .expect(403)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("is not an admin");
@@ -211,11 +211,11 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const drawer = await Drawer.findById(item.drawer);
       expect(drawer.items).not.toContainEqual(item._id);
     });
-    test("Without a token returns 400 and a valid error message", async () => {
+    test("Without a token returns 401 and a valid error message", async () => {
       const drawer = await helper.setupAndGetItemForTest();
       const response = await api
         .delete(`/api/items/${drawer.id}`)
-        .expect(400)
+        .expect(401)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain(
@@ -265,13 +265,13 @@ describe("When some cabinets, drawers, and users already exist", () => {
         "provided objectId for item doesn't exist"
       );
     });
-    test("With a non-admin token returns 401 and a valid error message", async () => {
+    test("With a non-admin token returns 403 and a valid error message", async () => {
       const item = await helper.setupAndGetItemForTest();
       const token = await helper.getRandomNonAdminTokenFrom(originalUsers);
       const response = await api
         .delete(`/api/items/${item.id}`)
         .set("Authorization", `Bearer ${token}`)
-        .expect(401)
+        .expect(403)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("is not an admin");
@@ -385,12 +385,12 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const updatedItem = await Item.findById(item._id);
       expect(updatedItem.drawer).toEqual(updatedItem.drawer);
     });
-    test("Without a token returns 400 and a valid error message", async () => {
+    test("Without a token returns 401 and a valid error message", async () => {
       const item = await helper.setupAndGetItemForTest();
       const response = await api
         .put(`/api/items/${item._id}`)
         .send({ name: uuid() })
-        .expect(400)
+        .expect(401)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain(
@@ -441,7 +441,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
         "provided objectId for item doesn't exist"
       );
     });
-    test("With a non-admin token returns 401 and a valid error message", async () => {
+    test("With a non-admin token returns 403 and a valid error message", async () => {
       const item = await helper.setupAndGetItemForTest();
       const token = await helper.getRandomNonAdminTokenFrom(originalUsers);
 
@@ -449,7 +449,7 @@ describe("When some cabinets, drawers, and users already exist", () => {
         .put(`/api/items/${item._id}`)
         .send({ name: uuid() })
         .set("Authorization", `Bearer ${token}`)
-        .expect(401)
+        .expect(403)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("is not an admin");
@@ -459,12 +459,12 @@ describe("When some cabinets, drawers, and users already exist", () => {
     });
   });
   describe("getting items", () => {
-    test("Without a token returns 400 and a valid error message", async () => {
+    test("Without a token returns 401 and a valid error message", async () => {
       const cabinets = helper.generateRandomCabinetData(5, 1);
       await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
       const response = await api
         .get("/api/items")
-        .expect(400)
+        .expect(401)
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain(

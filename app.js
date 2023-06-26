@@ -7,6 +7,7 @@ const usersRouter = require("./routers/users");
 const cabinetsRouter = require("./routers/cabinets");
 const drawersRouter = require("./routers/drawers");
 const itemsRouter = require("./routers/items");
+const loginRouter = require("./routers/login");
 const middleware = require("./utils/middleware");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/cabinets", middleware.userExtractor, cabinetsRouter);
 app.use("/api/drawers", middleware.userExtractor, drawersRouter);
 app.use("/api/items", middleware.userExtractor, itemsRouter);
+app.use("/api/login", loginRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
