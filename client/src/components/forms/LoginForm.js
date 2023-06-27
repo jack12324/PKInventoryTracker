@@ -7,9 +7,15 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
-import loginService from "../../services/login";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../reducers/userReducer";
+import ErrorAlert from "../alerts/ErrorAlert";
+import { successToast } from "../alerts/Toasts";
 
 function LoginForm() {
+  const [error, setError] = useState("");
   const {
     register,
     handleSubmit,
@@ -21,17 +27,23 @@ function LoginForm() {
     },
   });
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const submitForm = async (data) => {
     try {
-      const response = await loginService.login(data);
-      console.log(response);
+      await dispatch(loginUser(data));
+      setError("");
+      successToast("Log in successful");
+      navigate("/home");
     } catch (err) {
-      console.error(err.response.data.error);
+      setError("Invalid username or password");
     }
   };
 
   return (
     <form onSubmit={handleSubmit(submitForm)}>
+      {error && <ErrorAlert msg={error} />}
       <FormControl isInvalid={errors.username}>
         <FormLabel htmlFor="username">Username</FormLabel>
         <Input

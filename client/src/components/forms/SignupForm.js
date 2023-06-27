@@ -7,9 +7,14 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import usersService from "../../services/users";
+import { successToast } from "../alerts/Toasts";
+import ErrorAlert from "../alerts/ErrorAlert";
 
 function SignupForm() {
+  const [error, setError] = useState("");
   const {
     register,
     handleSubmit,
@@ -21,27 +26,31 @@ function SignupForm() {
     },
   });
 
+  const navigate = useNavigate();
+
   const submitForm = async (data) => {
     try {
-      const response = await usersService.create(data);
-      console.log(response);
+      await usersService.create(data);
+      successToast("User added, please log in");
+      navigate("/login");
     } catch (err) {
-      console.error(err.response.data.error);
+      setError(err.response.data.error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit(submitForm)}>
+      {error && <ErrorAlert msg={error} />}
       <FormControl isInvalid={errors.username}>
         <FormLabel htmlFor="username">Username</FormLabel>
         <Input
           id="username"
-          placeholder="username"
+          placeholder="Username"
           {...register("username", {
-            required: "username is required",
+            required: "Username is required",
             minLength: {
               value: 5,
-              message: "username must be at least 5 characters",
+              message: "Username must be at least 5 characters",
             },
           })}
         />
@@ -53,8 +62,14 @@ function SignupForm() {
         <FormLabel htmlFor="password">Password</FormLabel>
         <Input
           id="password"
-          placeholder="password"
-          {...register("password", { required: "password is required" })}
+          placeholder="Password"
+          {...register("password", {
+            required: "Password is required",
+            minLength: {
+              value: 8,
+              message: "Password must be at least 8 characters",
+            },
+          })}
         />
         <FormErrorMessage>
           {errors.password && errors.password.message}
