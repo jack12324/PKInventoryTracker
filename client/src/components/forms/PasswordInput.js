@@ -1,8 +1,10 @@
 import { Button, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
-function PasswordInput(props) {
+function PasswordInput({ options, register }) {
   const [showPassword, setShowPassword] = useState(false);
+
   return (
     <InputGroup>
       <Input
@@ -10,7 +12,7 @@ function PasswordInput(props) {
         placeholder="Enter Password"
         type={showPassword ? "text" : "password"}
         /* eslint-disable-next-line react/jsx-props-no-spreading */
-        {...props}
+        {...register("password", options)}
       />
       <InputRightElement>
         <Button onClick={() => setShowPassword(!showPassword)}>
@@ -20,5 +22,11 @@ function PasswordInput(props) {
     </InputGroup>
   );
 }
+
+PasswordInput.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  options: PropTypes.object.isRequired,
+  register: PropTypes.func.isRequired,
+};
 
 export default PasswordInput;

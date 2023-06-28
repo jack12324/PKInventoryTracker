@@ -59,9 +59,8 @@ function LoginForm() {
       <FormControl isInvalid={errors.password}>
         <FormLabel htmlFor="password">Password</FormLabel>
         <PasswordInput
-          props={{
-            ...register("password", { required: "Password is required" }),
-          }}
+          register={register}
+          options={{ required: "Password is required" }}
         />
         <FormErrorMessage>
           {errors.password && errors.password.message}

@@ -62,14 +62,13 @@ function SignupForm() {
       <FormControl isInvalid={errors.password}>
         <FormLabel htmlFor="password">Password</FormLabel>
         <PasswordInput
-          props={{
-            ...register("password", {
-              required: "Password is required",
-              minLength: {
-                value: 8,
-                message: "Password must be at least 8 characters",
-              },
-            }),
+          register={register}
+          options={{
+            required: "Password is required",
+            minLength: {
+              value: 8,
+              message: "Password must be at least 8 characters",
+            },
           }}
         />
         <FormErrorMessage>
