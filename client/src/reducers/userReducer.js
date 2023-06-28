@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import loginService from "../services/login";
+import { successToast } from "../components/alerts/Toasts";
 
 const LSUSERKEY = "PKInventoryUser";
 
@@ -27,6 +28,7 @@ export const loginUser = (credentials) => async (dispatch) => {
 export const logoutUser = () => (dispatch) => {
   dispatch(clearUser());
   localStorage.removeItem(LSUSERKEY);
+  successToast("Log out successful");
 };
 
 export const initializeUser = () => (dispatch) => {
