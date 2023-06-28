@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../reducers/userReducer";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
+import PasswordInput from "./PasswordInput";
 
 function LoginForm() {
   const [error, setError] = useState("");
@@ -48,8 +49,8 @@ function LoginForm() {
         <FormLabel htmlFor="username">Username</FormLabel>
         <Input
           id="username"
-          placeholder="username"
-          {...register("username", { required: "username is required" })}
+          placeholder="Enter Username"
+          {...register("username", { required: "Username is required" })}
         />
         <FormErrorMessage>
           {errors.username && errors.username.message}
@@ -57,10 +58,10 @@ function LoginForm() {
       </FormControl>
       <FormControl isInvalid={errors.password}>
         <FormLabel htmlFor="password">Password</FormLabel>
-        <Input
-          id="password"
-          placeholder="password"
-          {...register("password", { required: "password is required" })}
+        <PasswordInput
+          props={{
+            ...register("password", { required: "Password is required" }),
+          }}
         />
         <FormErrorMessage>
           {errors.password && errors.password.message}

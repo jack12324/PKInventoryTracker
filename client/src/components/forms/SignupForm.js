@@ -12,6 +12,7 @@ import { useState } from "react";
 import usersService from "../../services/users";
 import { successToast } from "../alerts/Toasts";
 import ErrorAlert from "../alerts/ErrorAlert";
+import PasswordInput from "./PasswordInput";
 
 function SignupForm() {
   const [error, setError] = useState("");
@@ -60,16 +61,16 @@ function SignupForm() {
       </FormControl>
       <FormControl isInvalid={errors.password}>
         <FormLabel htmlFor="password">Password</FormLabel>
-        <Input
-          id="password"
-          placeholder="Password"
-          {...register("password", {
-            required: "Password is required",
-            minLength: {
-              value: 8,
-              message: "Password must be at least 8 characters",
-            },
-          })}
+        <PasswordInput
+          props={{
+            ...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 8,
+                message: "Password must be at least 8 characters",
+              },
+            }),
+          }}
         />
         <FormErrorMessage>
           {errors.password && errors.password.message}
