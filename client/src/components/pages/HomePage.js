@@ -6,6 +6,7 @@ import ModalCabinetForm from "../forms/ModalCabinetForm";
 
 function HomePage() {
   const user = useSelector((state) => state.user);
+  const cabinets = useSelector((state) => state.cabinets);
 
   if (!user || user.initializing) return null;
 
@@ -15,6 +16,13 @@ function HomePage() {
       <AddHandler addName="Cabinet">
         <ModalCabinetForm />
       </AddHandler>
+      {cabinets
+        ? cabinets.map((c) => (
+            <p>
+              {c.name} {c.drawers.length}
+            </p>
+          ))
+        : null}
     </>
   ) : (
     <Navigate to="/login" />

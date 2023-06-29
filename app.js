@@ -1,6 +1,7 @@
 const express = require("express");
 require("express-async-errors");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const logger = require("./utils/logger");
 const config = require("./utils/config");
 const usersRouter = require("./routers/users");
@@ -23,6 +24,7 @@ mongoose
     logger.error(`Connection to MongoDB failed with error: "${error}"`);
   });
 
+app.use(cors());
 app.use(express.json());
 app.use("/api/users", usersRouter);
 app.use("/api/cabinets", middleware.userExtractor, cabinetsRouter);
