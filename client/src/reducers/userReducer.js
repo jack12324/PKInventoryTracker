@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import loginService from "../services/login";
-import { errorToast, successToast } from "../components/alerts/Toasts";
 import cabinetsService from "../services/cabinets";
 import { clearCabinets, initializeCabinets } from "./cabinetsReducer";
 
@@ -33,7 +32,6 @@ export const logoutUser = () => (dispatch) => {
   dispatch(clearUser());
   localStorage.removeItem(LSUSERKEY);
   cabinetsService.setToken("");
-  successToast("Log out successful");
   dispatch(clearCabinets());
 };
 
@@ -42,21 +40,8 @@ export const initializeUser = () => async (dispatch) => {
   if (localUser) {
     const user = JSON.parse(localUser);
     cabinetsService.setToken(user.token);
-    try {
-      dispatch(initializeCabinets());
-      dispatch(setUser(user));
-    } catch (err) {
-      const message = err?.response?.data?.error?.message;
-      if (message === "jwt expired") {
-        dispatch(clearUser());
-        errorToast("Your session token has expired, please log in again");
-        localStorage.removeItem(LSUSERKEY);
-      } else if (message) {
-        errorToast(message);
-      } else {
-        errorToast("Some error occurred while loading cabinets");
-      }
-    }
+    dispatch(initializeCabinets());
+    dispatch(setUser(user));
   } else {
     dispatch(clearUser());
     dispatch(clearCabinets());

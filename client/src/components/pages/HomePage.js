@@ -18,7 +18,7 @@ function HomePage() {
       </AddHandler>
       {cabinets
         ? cabinets.map((c) => (
-            <p>
+            <p key={c.id}>
               {c.name} {c.drawers.length}
             </p>
           ))

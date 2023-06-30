@@ -3,6 +3,7 @@ import { Button, HStack, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useCsrBreakpointValue } from "../hooks";
 import { logoutUser } from "../reducers/userReducer";
+import { successToast } from "./alerts/Toasts";
 
 function CurrentUser() {
   const user = useSelector((state) => state.user);
@@ -13,6 +14,7 @@ function CurrentUser() {
   const onLogout = () => {
     dispatch(logoutUser());
     navigate("/login");
+    successToast("Log out successful");
   };
 
   return (

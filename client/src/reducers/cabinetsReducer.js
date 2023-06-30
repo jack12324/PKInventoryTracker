@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import cabinetsService from "../services/cabinets";
+import { setError } from "./errorReducer";
 
 const cabinetsSlice = createSlice({
   name: "cabinets",
@@ -17,13 +18,31 @@ export const { setCabinets, clearCabinets, appendCabinet } =
   cabinetsSlice.actions;
 
 export const initializeCabinets = () => async (dispatch) => {
-  const cabinets = await cabinetsService.getCabinets();
-  dispatch(setCabinets(cabinets));
+  try {
+    const cabinets = await cabinetsService.getCabinets();
+    dispatch(setCabinets(cabinets));
+  } catch (err) {
+    if (err.name === "AxiosError") {
+      dispatch(setError(err.response.data, "GET CABINETS"));
+    } else {
+      dispatch(setError(err, "GET CABINETS"));
+    }
+  }
 };
 
 export const addCabinet = (cabinetData) => async (dispatch) => {
-  const cabinet = await cabinetsService.addCabinet(cabinetData);
-  dispatch(appendCabinet(cabinet));
+  try {
+    const cabinet = await cabinetsService.addCabinet(cabinetData);
+    dispatch(appendCabinet(cabinet));
+    return true;
+  } catch (err) {
+    if (err.name === "AxiosError") {
+      dispatch(setError(err.response.data, "ADD CABINET"));
+    } else {
+      dispatch(setError(err, "ADD CABINET"));
+    }
+    return false;
+  }
 };
 
 export default cabinetsSlice.reducer;

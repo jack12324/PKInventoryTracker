@@ -15,13 +15,14 @@ import {
   NumberInputStepper,
   useModalContext,
 } from "@chakra-ui/react";
-import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { addCabinet } from "../../reducers/cabinetsReducer";
 import { successToast } from "../alerts/Toasts";
 import ErrorAlert from "../alerts/ErrorAlert";
 
 function ModalCabinetForm() {
+  const globalError = useSelector((state) => state.error);
   const [error, setError] = useState("");
   const {
     register,
@@ -34,33 +35,34 @@ function ModalCabinetForm() {
     },
   });
 
+  useEffect(() => {
+    if (globalError.active && globalError.scope === "ADD CABINET") {
+      setError(globalError.message);
+    }
+  }, [globalError]);
+
   const dispatch = useDispatch();
   const { onClose } = useModalContext();
   const submitForm = async (data) => {
-    try {
-      dispatch(addCabinet(data));
-      setError("");
+    setError("");
+    const success = await dispatch(addCabinet(data));
+    if (success) {
       successToast(`Added cabinet ${data.name}`);
       onClose();
-    } catch (err) {
-      if (err?.response?.data?.error?.message) {
-        setError(err.response.data.error.message);
-      } else {
-        setError("There was an error adding this cabinet");
-      }
     }
+    setError("There was an error adding this cabinet");
   };
 
   return (
     <form onSubmit={handleSubmit(submitForm)}>
-      {error && <ErrorAlert msg={error} />}
       <ModalBody>
+        {error && <ErrorAlert msg={error} />}
         <FormControl isInvalid={errors.name}>
           <FormLabel htmlFor="name">Name</FormLabel>
           <Input
             id="name"
             placeholder="Enter a name/identifier for the cabinet"
-            {...register("name", { required: "Name is required" })}
+            {...register("name")}
           />
           <FormErrorMessage>
             {errors.name && errors.name.message}
