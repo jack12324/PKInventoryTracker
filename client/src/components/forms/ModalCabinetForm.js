@@ -50,25 +50,24 @@ function ModalCabinetForm() {
       successToast(`Added cabinet ${data.name}`);
       onClose();
     }
-    setError("There was an error adding this cabinet");
   };
 
   return (
     <form onSubmit={handleSubmit(submitForm)}>
       <ModalBody>
         {error && <ErrorAlert msg={error} />}
-        <FormControl isInvalid={errors.name}>
+        <FormControl isInvalid={errors.name} isRequired>
           <FormLabel htmlFor="name">Name</FormLabel>
           <Input
             id="name"
             placeholder="Enter a name/identifier for the cabinet"
-            {...register("name")}
+            {...register("name", { required: "Name is required" })}
           />
           <FormErrorMessage>
             {errors.name && errors.name.message}
           </FormErrorMessage>
         </FormControl>
-        <FormControl isInvalid={errors.numDrawers}>
+        <FormControl isInvalid={errors.numDrawers} isRequired>
           <FormLabel htmlFor="numDrawers">Number of Drawers</FormLabel>
           <NumberInput
             min={1}
@@ -82,7 +81,7 @@ function ModalCabinetForm() {
               {...register("numDrawers", {
                 required: "Number of drawers is required",
                 min: {
-                  value: 0,
+                  value: 1,
                   message: "Cabinet must have at least one drawer",
                 },
                 max: {

@@ -11,6 +11,7 @@ cabinetsRouter.post("/", middleware.requireAdmin, async (req, res) => {
     name,
   });
 
+  console.log(numDrawers);
   const drawers =
     numDrawers > 0
       ? Array.from(
@@ -18,10 +19,12 @@ cabinetsRouter.post("/", middleware.requireAdmin, async (req, res) => {
           (_, i) => new Drawer({ cabinet: newCabinet._id, position: i + 1 })
         )
       : [];
+  console.log(drawers);
 
   newCabinet.drawers = drawers.map((d) => d._id);
 
   await Promise.all(drawers.map((d) => d.save()));
+
   const addedCabinet = await newCabinet.save();
 
   res.status(201).json(addedCabinet);

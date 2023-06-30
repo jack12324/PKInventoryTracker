@@ -1,25 +1,18 @@
 import axios from "axios";
+import tokenHelper from "./tokenHelper";
 
-let token = "";
 const URL = "/api/cabinets";
 
-const getConfig = () => ({
-  headers: { Authorization: `Bearer ${token}` },
-});
-const setToken = (newToken) => {
-  token = newToken;
-};
-
 const getCabinets = async () => {
-  const response = await axios.get(URL, getConfig());
+  const response = await axios.get(URL, tokenHelper.getConfig());
   return response.data;
 };
 
 const addCabinet = async (cabinetData) => {
-  const response = await axios.post(URL, cabinetData, getConfig());
+  const response = await axios.post(URL, cabinetData, tokenHelper.getConfig());
   return response.data;
 };
 
-const cabinetsService = { getCabinets, setToken, addCabinet };
+const cabinetsService = { getCabinets, addCabinet };
 
 export default cabinetsService;

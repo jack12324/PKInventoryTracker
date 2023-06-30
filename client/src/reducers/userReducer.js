@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import loginService from "../services/login";
-import cabinetsService from "../services/cabinets";
 import { clearCabinets, initializeCabinets } from "./cabinetsReducer";
+import tokenHelper from "../services/tokenHelper";
+import { clearDrawers, initializeDrawers } from "./drawersReducer";
 
 const LSUSERKEY = "PKInventoryUser";
 
@@ -24,27 +25,31 @@ export const loginUser = (credentials) => async (dispatch) => {
   const user = await loginService.login(credentials);
   dispatch(setUser(user));
   localStorage.setItem(LSUSERKEY, JSON.stringify(user));
-  cabinetsService.setToken(user.token);
+  tokenHelper.setToken(user.token);
   dispatch(initializeCabinets());
+  dispatch(initializeDrawers());
 };
 
 export const logoutUser = () => (dispatch) => {
   dispatch(clearUser());
   localStorage.removeItem(LSUSERKEY);
-  cabinetsService.setToken("");
+  tokenHelper.setToken("");
   dispatch(clearCabinets());
+  dispatch(clearDrawers());
 };
 
 export const initializeUser = () => async (dispatch) => {
   const localUser = localStorage.getItem(LSUSERKEY);
   if (localUser) {
     const user = JSON.parse(localUser);
-    cabinetsService.setToken(user.token);
+    tokenHelper.setToken(user.token);
     dispatch(initializeCabinets());
+    dispatch(initializeDrawers());
     dispatch(setUser(user));
   } else {
     dispatch(clearUser());
     dispatch(clearCabinets());
+    dispatch(clearDrawers());
   }
 };
 
