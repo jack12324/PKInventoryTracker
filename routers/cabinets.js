@@ -7,11 +7,15 @@ const middleware = require("../utils/middleware");
 cabinetsRouter.post("/", middleware.requireAdmin, async (req, res) => {
   const { name, numDrawers } = req.body;
 
+  if (numDrawers && !Number.isInteger(numDrawers)) {
+    res.status(400).send({ error: "numDrawers should be an integer" });
+    return;
+  }
+
   const newCabinet = new Cabinet({
     name,
   });
 
-  console.log(numDrawers);
   const drawers =
     numDrawers > 0
       ? Array.from(
@@ -19,7 +23,6 @@ cabinetsRouter.post("/", middleware.requireAdmin, async (req, res) => {
           (_, i) => new Drawer({ cabinet: newCabinet._id, position: i + 1 })
         )
       : [];
-  console.log(drawers);
 
   newCabinet.drawers = drawers.map((d) => d._id);
 

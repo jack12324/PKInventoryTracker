@@ -67,6 +67,24 @@ describe("When some cabinets and users already exist", () => {
         expect(d).toBeDefined();
       });
     });
+    test("with number of drawers as a string fails with 400 and an error message", async () => {
+      const token = await helper.getRandomAdminTokenFrom(originalUsers);
+      const newCabinet = {
+        name: uuid(),
+        numDrawers: "5",
+      };
+      const response = await api
+        .post("/api/cabinets")
+        .send(newCabinet)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(400)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("numDrawers should be an integer");
+
+      const addedCabinet = await Cabinet.findOne({ name: newCabinet.name });
+      expect(addedCabinet).toBeNull();
+    });
     test("without a name fails with 400 and returns an error", async () => {
       const token = await helper.getRandomAdminTokenFrom(originalUsers);
       const newCabinet = {};

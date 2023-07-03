@@ -20,10 +20,12 @@ import { useEffect, useState } from "react";
 import { addCabinet } from "../../reducers/cabinetsReducer";
 import { successToast } from "../alerts/Toasts";
 import ErrorAlert from "../alerts/ErrorAlert";
+import { clearError } from "../../reducers/errorReducer";
 
 function ModalCabinetForm() {
   const globalError = useSelector((state) => state.error);
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -38,10 +40,10 @@ function ModalCabinetForm() {
   useEffect(() => {
     if (globalError.active && globalError.scope === "ADD CABINET") {
       setError(globalError.message);
+      dispatch(clearError());
     }
   }, [globalError]);
 
-  const dispatch = useDispatch();
   const { onClose } = useModalContext();
   const submitForm = async (data) => {
     setError("");
@@ -80,6 +82,11 @@ function ModalCabinetForm() {
               placeholder="Number of drawers in cabinet"
               {...register("numDrawers", {
                 required: "Number of drawers is required",
+                valueAsNumber: true,
+                validate: (value) =>
+                  (Number.isInteger(parseFloat(value, 10)) &&
+                    parseInt(value, 10) > 0) ||
+                  "Number of drawers must be a positive integer",
                 min: {
                   value: 1,
                   message: "Cabinet must have at least one drawer",
