@@ -9,14 +9,18 @@ import {
   ModalBody,
   ModalFooter,
   Select,
+  useModalContext,
 } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import ErrorAlert from "../alerts/ErrorAlert";
+import { successToast } from "../alerts/Toasts";
+import { addDrawer } from "../../reducers/drawersReducer";
 
 function ModalDrawerForm() {
   const globalError = useSelector((state) => state.error);
   const cabinets = useSelector((state) => state.cabinets);
+  const drawers = useSelector((state) => state.drawers);
   const [error, setError] = useState("");
   const {
     register,
@@ -35,16 +39,23 @@ function ModalDrawerForm() {
     }
   }, [globalError]);
 
-  // const dispatch = useDispatch();
-  // const { onClose } = useModalContext();
+  const dispatch = useDispatch();
+  const { onClose } = useModalContext();
   const submitForm = async (data) => {
     setError("");
-    console.log(data);
-    // const success = await dispatch(addCabinet(data));
-    // if (success) {
-    //  successToast(`Added drawer${data.name ? ` ${data.name}` : ""}`);
-    //  onClose();
-    // }
+    const cabinet = cabinets.find((c) => c.id === data.cabinet);
+    const position =
+      1 +
+      Math.max(
+        ...cabinet.drawers.map(
+          (cd) => drawers.find((d) => d.id === cd).position
+        )
+      );
+    const success = await dispatch(addDrawer({ ...data, position }));
+    if (success) {
+      successToast(`Added drawer${data.name ? ` ${data.name}` : ""}`);
+      onClose();
+    }
   };
 
   return (

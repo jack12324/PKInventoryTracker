@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import drawersService from "../services/drawers";
 import { setError } from "./errorReducer";
+// eslint-disable-next-line import/no-cycle
+import { appendDrawerToCabinet } from "./cabinetsReducer";
 
 const drawersSlice = createSlice({
   name: "drawers",
@@ -29,10 +31,13 @@ export const initializeDrawers = () => async (dispatch) => {
   }
 };
 
-export const addDrawer = (cabinetData) => async (dispatch) => {
+export const addDrawer = (drawerData) => async (dispatch) => {
   try {
-    const cabinet = await drawersService.addDrawer(cabinetData);
-    dispatch(appendDrawer(cabinet));
+    const drawer = await drawersService.addDrawer(drawerData);
+    dispatch(appendDrawer(drawer));
+    dispatch(
+      appendDrawerToCabinet({ cabinet: drawerData.cabinet, drawer: drawer.id })
+    );
     return true;
   } catch (err) {
     if (err.name === "AxiosError") {

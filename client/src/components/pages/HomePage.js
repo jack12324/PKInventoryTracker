@@ -4,6 +4,7 @@ import NavBar from "../Navigation/NavBar";
 import AddHandler from "../AddHandler";
 import ModalCabinetForm from "../forms/ModalCabinetForm";
 import ModalDrawerForm from "../forms/ModalDrawerForm";
+import ModalItemForm from "../forms/ModalItemForm";
 
 function HomePage() {
   const user = useSelector((state) => state.user);
@@ -21,6 +22,9 @@ function HomePage() {
       <AddHandler addName="Drawer">
         <ModalDrawerForm />
       </AddHandler>
+      <AddHandler addName="Item">
+        <ModalItemForm />
+      </AddHandler>
       {cabinets
         ? cabinets.map((c) => (
             <section key={c.id}>
@@ -30,11 +34,9 @@ function HomePage() {
               {drawers
                 ? drawers
                     .filter((d) => d.cabinet === c.id)
-                    .sort((a, b) => a.position - b.position)
+                    .sort((a, b) => b.position - a.position)
                     .map((d) => (
-                      <p key={d.id}>
-                        {d.name} {d.position}
-                      </p>
+                      <p key={d.id}>{`---${d.name} ${d.position}`}</p>
                     ))
                 : null}
             </section>
