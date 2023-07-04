@@ -13,10 +13,16 @@ const drawersSlice = createSlice({
     appendDrawer: (state, action) => {
       state.push(action.payload);
     },
+    appendItemToDrawer: (state, action) => {
+      state
+        .find((d) => d.id === action.payload.drawer)
+        .items.push(action.payload.item);
+    },
   },
 });
 
-export const { setDrawers, clearDrawers, appendDrawer } = drawersSlice.actions;
+export const { setDrawers, clearDrawers, appendDrawer, appendItemToDrawer } =
+  drawersSlice.actions;
 
 export const initializeDrawers = () => async (dispatch) => {
   try {

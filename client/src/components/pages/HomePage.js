@@ -10,6 +10,7 @@ function HomePage() {
   const user = useSelector((state) => state.user);
   const cabinets = useSelector((state) => state.cabinets);
   const drawers = useSelector((state) => state.drawers);
+  const items = useSelector((state) => state.items);
 
   if (!user || user.initializing) return null;
 
@@ -36,7 +37,15 @@ function HomePage() {
                     .filter((d) => d.cabinet === c.id)
                     .sort((a, b) => b.position - a.position)
                     .map((d) => (
-                      <p key={d.id}>{`---${d.name} ${d.position}`}</p>
+                      <section key={d.id}>
+                        <h3 key={d.id}>{`---${d.name} ${d.position}`}</h3>
+                        {items
+                          ? items
+                              .filter((i) => i.drawer === d.id)
+                              .sort((a, b) => (a.name < b.name ? -1 : 1))
+                              .map((i) => <p key={i.id}>{`------${i.name}`}</p>)
+                          : null}
+                      </section>
                     ))
                 : null}
             </section>

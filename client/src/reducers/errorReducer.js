@@ -37,8 +37,18 @@ export const createError = (err, area = "GENERAL") => {
     scope = "ADD DRAWER";
   }
 
+  if (area === "ADD ITEM") {
+    message = "Error while adding item";
+    scope = "ADD ITEM";
+  }
+
   if (area === "GET DRAWERS") {
     message = "Error while getting drawers";
+    scope = "GENERAL";
+  }
+
+  if (area === "GET ITEMS") {
+    message = "Error while getting items";
     scope = "GENERAL";
   }
 

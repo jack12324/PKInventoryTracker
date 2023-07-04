@@ -3,6 +3,7 @@ import loginService from "../services/login";
 import { clearCabinets, initializeCabinets } from "./cabinetsReducer";
 import tokenHelper from "../services/tokenHelper";
 import { clearDrawers, initializeDrawers } from "./drawersReducer";
+import { clearItems, initializeItems } from "./itemsReducer";
 
 const LSUSERKEY = "PKInventoryUser";
 
@@ -28,6 +29,7 @@ export const loginUser = (credentials) => async (dispatch) => {
   tokenHelper.setToken(user.token);
   dispatch(initializeCabinets());
   dispatch(initializeDrawers());
+  dispatch(initializeItems());
 };
 
 export const logoutUser = () => (dispatch) => {
@@ -36,6 +38,7 @@ export const logoutUser = () => (dispatch) => {
   tokenHelper.setToken("");
   dispatch(clearCabinets());
   dispatch(clearDrawers());
+  dispatch(clearItems());
 };
 
 export const initializeUser = () => async (dispatch) => {
@@ -45,11 +48,13 @@ export const initializeUser = () => async (dispatch) => {
     tokenHelper.setToken(user.token);
     dispatch(initializeCabinets());
     dispatch(initializeDrawers());
+    dispatch(initializeItems());
     dispatch(setUser(user));
   } else {
     dispatch(clearUser());
     dispatch(clearCabinets());
     dispatch(clearDrawers());
+    dispatch(clearItems());
   }
 };
 
