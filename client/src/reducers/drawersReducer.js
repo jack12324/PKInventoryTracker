@@ -2,7 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 import drawersService from "../services/drawers";
 import { setError } from "./errorReducer";
 // eslint-disable-next-line import/no-cycle
-import { appendDrawerToCabinet } from "./cabinetsReducer";
+import {
+  appendDrawerToCabinet,
+  removeDrawerFromCabinet,
+} from "./cabinetsReducer";
 
 const drawersSlice = createSlice({
   name: "drawers",
@@ -18,22 +21,28 @@ const drawersSlice = createSlice({
         .find((d) => d.id === action.payload.drawer)
         .items.push(action.payload.item);
     },
+    deleteDrawer: (state, action) =>
+      state.filter((d) => d.id !== action.payload.id),
+    updateDrawer: (state, action) =>
+      state.map((d) => (d.id === action.payload.id ? action.payload : d)),
   },
 });
 
-export const { setDrawers, clearDrawers, appendDrawer, appendItemToDrawer } =
-  drawersSlice.actions;
+export const {
+  setDrawers,
+  clearDrawers,
+  appendDrawer,
+  appendItemToDrawer,
+  deleteDrawer,
+  updateDrawer,
+} = drawersSlice.actions;
 
 export const initializeDrawers = () => async (dispatch) => {
   try {
     const drawers = await drawersService.getDrawers();
     dispatch(setDrawers(drawers));
   } catch (err) {
-    if (err.name === "AxiosError") {
-      dispatch(setError(err.response.data, "GET DRAWERS"));
-    } else {
-      dispatch(setError(err, "GET DRAWERS"));
-    }
+    dispatch(setError(err, "GET DRAWERS"));
   }
 };
 
@@ -46,11 +55,33 @@ export const addDrawer = (drawerData) => async (dispatch) => {
     );
     return true;
   } catch (err) {
-    if (err.name === "AxiosError") {
-      dispatch(setError(err.response.data, "ADD DRAWER"));
-    } else {
-      dispatch(setError(err, "ADD DRAWER"));
+    dispatch(setError(err, "ADD DRAWER"));
+    return false;
+  }
+};
+export const removeDrawer = (drawerData) => async (dispatch) => {
+  try {
+    await drawersService.deleteDrawer(drawerData.id);
+    dispatch(deleteDrawer(drawerData));
+    dispatch(removeDrawerFromCabinet(drawerData));
+    return true;
+  } catch (err) {
+    dispatch(setError(err, "DELETE DRAWER"));
+    return false;
+  }
+};
+
+export const editDrawer = (oldDrawer, drawerData) => async (dispatch) => {
+  try {
+    await drawersService.updateDrawer(drawerData.id, drawerData);
+    dispatch(updateDrawer(drawerData));
+    if (oldDrawer.cabinet !== drawerData.cabinet) {
+      dispatch(removeDrawerFromCabinet(oldDrawer));
+      dispatch(appendDrawerToCabinet(drawerData));
     }
+    return true;
+  } catch (err) {
+    dispatch(setError(err, "EDIT DRAWER"));
     return false;
   }
 };

@@ -7,16 +7,18 @@ import {
   IconButton,
   Text,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { createSelector } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
-import store from "../store";
-import ConfirmAlert from "./alerts/ConfirmAlert";
-import { removeCabinet } from "../reducers/cabinetsReducer";
-import ModalWrapper from "./ModalWrapper";
-import ModalEditCabinetForm from "./forms/ModalEditCabinetForm";
+import store from "../../store";
+import ConfirmAlert from "../alerts/ConfirmAlert";
+import { removeCabinet } from "../../reducers/cabinetsReducer";
+import ModalWrapper from "../forms/ModalWrapper";
+import ModalEditCabinetForm from "../forms/ModalEditCabinetForm";
+import Drawer from "./Drawer";
 
 function Cabinet({ cabinet }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -91,12 +93,13 @@ function Cabinet({ cabinet }) {
           </HStack>
         </HStack>
         <Collapse in={isOpen} animateOpacity>
-          {drawers ? (
-            drawers.map((d) => <Text key={d.id}>{d.position}</Text>)
-          ) : (
-            <Text>Cabinet is Empty</Text>
-          )}
-          <Box />
+          <VStack p={4}>
+            {drawers && drawers.length > 0 ? (
+              drawers.map((d) => <Drawer drawer={d} key={d.id} />)
+            ) : (
+              <Text>Cabinet is Empty</Text>
+            )}
+          </VStack>
         </Collapse>
       </Box>
     </>

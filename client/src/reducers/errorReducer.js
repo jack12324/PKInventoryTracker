@@ -104,7 +104,17 @@ export const createError = (err, area = "GENERAL") => {
 export const setError =
   (error, area = "GENERAL") =>
   (dispatch) => {
-    dispatch(errorSlice.actions.setError(createError(error, area)));
+    if (error.name === "AxiosError") {
+      dispatch(
+        errorSlice.actions.setError(createError(error.response.data, area))
+      );
+    } else if (error.message) {
+      console.error(error);
+      dispatch(errorSlice.actions.setError(createError(error.message, area)));
+    } else {
+      console.error(error);
+      dispatch(errorSlice.actions.setError(createError("unknown error", area)));
+    }
   };
 
 export default errorSlice.reducer;

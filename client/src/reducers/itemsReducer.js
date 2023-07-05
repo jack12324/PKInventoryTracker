@@ -22,11 +22,7 @@ export const initializeItems = () => async (dispatch) => {
     const items = await itemsService.getItems();
     dispatch(setItems(items));
   } catch (err) {
-    if (err.name === "AxiosError") {
-      dispatch(setError(err.response.data, "GET ITEMS"));
-    } else {
-      dispatch(setError(err, "GET ITEMS"));
-    }
+    dispatch(setError(err.message, "GET ITEMS"));
   }
 };
 
@@ -37,12 +33,7 @@ export const addItem = (itemData) => async (dispatch) => {
     dispatch(appendItemToDrawer({ drawer: itemData.drawer, item: item.id }));
     return true;
   } catch (err) {
-    if (err.name === "AxiosError") {
-      dispatch(setError(err.response.data, "ADD ITEM"));
-    } else {
-      console.error(err);
-      dispatch(setError(err.message, "ADD ITEM"));
-    }
+    dispatch(setError(err.message, "ADD ITEM"));
     return false;
   }
 };

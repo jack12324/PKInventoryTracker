@@ -13,6 +13,20 @@ const addDrawer = async (drawerData) => {
   return response.data;
 };
 
-const drawersService = { getDrawers, addDrawer };
+const deleteDrawer = async (id) => {
+  const response = await axios.delete(`${URL}/${id}`, tokenHelper.getConfig());
+  return response.data;
+};
+
+const updateDrawer = async (id, data) => {
+  const response = await axios.put(
+    `${URL}/${id}`,
+    data,
+    tokenHelper.getConfig()
+  );
+  return response.data;
+};
+
+const drawersService = { getDrawers, addDrawer, deleteDrawer, updateDrawer };
 
 export default drawersService;

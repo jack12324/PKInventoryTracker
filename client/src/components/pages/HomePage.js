@@ -2,11 +2,11 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { Heading, Text, VStack } from "@chakra-ui/react";
 import NavBar from "../Navigation/NavBar";
-import AddHandler from "../AddHandler";
+import AddHandler from "../forms/AddHandler";
 import ModalCabinetForm from "../forms/ModalCabinetForm";
 import ModalDrawerForm from "../forms/ModalDrawerForm";
 import ModalItemForm from "../forms/ModalItemForm";
-import Cabinet from "../Cabinet";
+import Cabinet from "../cards/Cabinet";
 
 function HomePage() {
   const user = useSelector((state) => state.user);
