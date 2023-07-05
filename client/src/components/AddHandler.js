@@ -1,7 +1,7 @@
 import { Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import PropTypes from "prop-types";
-import AddModal from "./AddModal";
+import ModalWrapper from "./ModalWrapper";
 
 function AddHandler({ addName, children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -10,9 +10,13 @@ function AddHandler({ addName, children }) {
       <Button rightIcon={<AddIcon />} variant="solid" onClick={onOpen}>
         Add {addName}
       </Button>
-      <AddModal onClose={onClose} isOpen={isOpen} heading={`Add a ${addName}`}>
+      <ModalWrapper
+        onClose={onClose}
+        isOpen={isOpen}
+        heading={`Add a ${addName}`}
+      >
         {children}
-      </AddModal>
+      </ModalWrapper>
     </>
   );
 }

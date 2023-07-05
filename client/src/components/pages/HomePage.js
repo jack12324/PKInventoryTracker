@@ -1,10 +1,12 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { Heading, Text, VStack } from "@chakra-ui/react";
 import NavBar from "../Navigation/NavBar";
 import AddHandler from "../AddHandler";
 import ModalCabinetForm from "../forms/ModalCabinetForm";
 import ModalDrawerForm from "../forms/ModalDrawerForm";
 import ModalItemForm from "../forms/ModalItemForm";
+import Cabinet from "../Cabinet";
 
 function HomePage() {
   const user = useSelector((state) => state.user);
@@ -26,6 +28,16 @@ function HomePage() {
       <AddHandler addName="Item">
         <ModalItemForm />
       </AddHandler>
+      <Heading>Cabinets</Heading>
+      {cabinets ? (
+        <VStack>
+          {cabinets.map((c) => (
+            <Cabinet key={c.id} cabinet={c} />
+          ))}
+        </VStack>
+      ) : (
+        <Text>There are no cabinets</Text>
+      )}
       {cabinets
         ? cabinets.map((c) => (
             <section key={c.id}>

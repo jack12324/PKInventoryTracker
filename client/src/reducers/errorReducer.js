@@ -42,6 +42,36 @@ export const createError = (err, area = "GENERAL") => {
     scope = "ADD ITEM";
   }
 
+  if (area === "EDIT CABINET") {
+    message = "Error while editing cabinet";
+    scope = "EDIT CABINET";
+  }
+
+  if (area === "EDIT DRAWER") {
+    message = "Error while editing drawer";
+    scope = "EDIT DRAWER";
+  }
+
+  if (area === "EDIT ITEM") {
+    message = "Error while editing item";
+    scope = "EDIT ITEM";
+  }
+
+  if (area === "DELETE CABINET") {
+    message = "Error while deleting cabinet";
+    scope = "GENERAL";
+  }
+
+  if (area === "DELETE ITEM") {
+    message = "Error while deleting item";
+    scope = "GENERAL";
+  }
+
+  if (area === "DELETE DRAWER") {
+    message = "Error while deleting drawer";
+    scope = "GENERAL";
+  }
+
   if (area === "GET DRAWERS") {
     message = "Error while getting drawers";
     scope = "GENERAL";

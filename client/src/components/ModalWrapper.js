@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 
-function AddModal({ isOpen, onClose, heading, children }) {
+function ModalWrapper({ isOpen, onClose, heading, children }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -23,10 +23,10 @@ function AddModal({ isOpen, onClose, heading, children }) {
   );
 }
 
-AddModal.propTypes = {
+ModalWrapper.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   heading: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };
-export default AddModal;
+export default ModalWrapper;

@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Container, useTheme } from "@chakra-ui/react";
 import LoginPage from "./components/pages/LoginPage";
 import SignupPage from "./components/pages/SignupPage";
 import HomePage from "./components/pages/HomePage";
@@ -9,6 +10,7 @@ import { errorToast } from "./components/alerts/Toasts";
 import { clearError } from "./reducers/errorReducer";
 
 function App() {
+  const theme = useTheme();
   const error = useSelector((state) => state.error);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,12 +32,14 @@ function App() {
   }, [error]);
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/home" element={<HomePage />} />
-      <Route path="" element={<Navigate to="/login" />} />
-    </Routes>
+    <Container w={{ xl: theme.breakpoints.xl }} maxW="100%">
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="" element={<Navigate to="/login" />} />
+      </Routes>
+    </Container>
   );
 }
 

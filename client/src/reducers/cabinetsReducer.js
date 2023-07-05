@@ -18,6 +18,12 @@ const cabinetsSlice = createSlice({
         .find((c) => c.id === action.payload.cabinet)
         .drawers.push(action.payload.drawer);
     },
+    deleteCabinet: (state, action) =>
+      state.filter((c) => c.id !== action.payload),
+    updateCabinet: (state, action) =>
+      state.map((c) =>
+        c.id === action.payload.id ? { ...c, name: action.payload.name } : c
+      ),
   },
 });
 
@@ -26,6 +32,8 @@ export const {
   clearCabinets,
   appendCabinet,
   appendDrawerToCabinet,
+  deleteCabinet,
+  updateCabinet,
 } = cabinetsSlice.actions;
 
 export const initializeCabinets = () => async (dispatch) => {
@@ -52,6 +60,36 @@ export const addCabinet = (cabinetData) => async (dispatch) => {
       dispatch(setError(err.response.data, "ADD CABINET"));
     } else {
       dispatch(setError(err, "ADD CABINET"));
+    }
+    return false;
+  }
+};
+
+export const removeCabinet = (cabinetData) => async (dispatch) => {
+  try {
+    await cabinetsService.deleteCabinet(cabinetData.id);
+    dispatch(deleteCabinet(cabinetData.id));
+    return true;
+  } catch (err) {
+    if (err.name === "AxiosError") {
+      dispatch(setError(err.response.data, "DELETE CABINET"));
+    } else {
+      dispatch(setError(err, "DELETE CABINET"));
+    }
+    return false;
+  }
+};
+
+export const editCabinet = (cabinetData) => async (dispatch) => {
+  try {
+    await cabinetsService.updateCabinet(cabinetData.id, cabinetData.name);
+    dispatch(updateCabinet(cabinetData));
+    return true;
+  } catch (err) {
+    if (err.name === "AxiosError") {
+      dispatch(setError(err.response.data, "EDIT CABINET"));
+    } else {
+      dispatch(setError(err, "EDIT CABINET"));
     }
     return false;
   }

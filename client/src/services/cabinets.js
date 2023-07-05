@@ -13,6 +13,25 @@ const addCabinet = async (cabinetData) => {
   return response.data;
 };
 
-const cabinetsService = { getCabinets, addCabinet };
+const deleteCabinet = async (id) => {
+  const response = await axios.delete(`${URL}/${id}`, tokenHelper.getConfig());
+  return response.data;
+};
+
+const updateCabinet = async (id, name) => {
+  const response = await axios.put(
+    `${URL}/${id}`,
+    { name },
+    tokenHelper.getConfig()
+  );
+  return response.data;
+};
+
+const cabinetsService = {
+  getCabinets,
+  addCabinet,
+  deleteCabinet,
+  updateCabinet,
+};
 
 export default cabinetsService;
