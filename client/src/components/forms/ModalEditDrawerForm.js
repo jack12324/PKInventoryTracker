@@ -18,16 +18,15 @@ import {
   useModalContext,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
 import { editDrawer } from "../../reducers/drawersReducer";
+import { useGlobalError } from "../../hooks";
 
 function ModalEditDrawerForm({ drawer }) {
-  const globalError = useSelector((state) => state.error);
   const cabinets = useSelector((state) => state.cabinets);
-  const [error, setError] = useState("");
+  const [error, setError] = useGlobalError("EDIT DRAWER");
   const {
     register,
     handleSubmit,
@@ -41,12 +40,6 @@ function ModalEditDrawerForm({ drawer }) {
       position: drawer.position,
     },
   });
-
-  useEffect(() => {
-    if (globalError.active && globalError.scope === "EDIT DRAWER") {
-      setError(globalError.message);
-    }
-  }, [globalError]);
 
   const dispatch = useDispatch();
   const { onClose } = useModalContext();

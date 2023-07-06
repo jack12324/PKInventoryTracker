@@ -12,16 +12,15 @@ import {
   useModalContext,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
 import { addItem } from "../../reducers/itemsReducer";
+import { useGlobalError } from "../../hooks";
 
 function ModalItemForm() {
-  const globalError = useSelector((state) => state.error);
   const cabinets = useSelector((state) => state.cabinets);
   const drawers = useSelector((state) => state.drawers);
-  const [error, setError] = useState("");
+  const [error, setError] = useGlobalError("ADD ITEM");
   const {
     register,
     handleSubmit,
@@ -41,12 +40,6 @@ function ModalItemForm() {
       cabinets.find((c) => c.id === watchCabinet)?.drawers?.includes(d.id)
     )
     ?.sort((a, b) => b.position - a.position);
-
-  useEffect(() => {
-    if (globalError.active && globalError.scope === "ADD ITEM") {
-      setError(globalError.message);
-    }
-  }, [globalError]);
 
   const dispatch = useDispatch();
   const { onClose } = useModalContext();

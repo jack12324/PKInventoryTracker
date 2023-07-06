@@ -15,16 +15,14 @@ import {
   NumberInputStepper,
   useModalContext,
 } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { addCabinet } from "../../reducers/cabinetsReducer";
 import { successToast } from "../alerts/Toasts";
 import ErrorAlert from "../alerts/ErrorAlert";
-import { clearError } from "../../reducers/errorReducer";
+import { useGlobalError } from "../../hooks";
 
 function ModalCabinetForm() {
-  const globalError = useSelector((state) => state.error);
-  const [error, setError] = useState("");
+  const [error, setError] = useGlobalError("ADD CABINET");
   const dispatch = useDispatch();
   const {
     register,
@@ -36,13 +34,6 @@ function ModalCabinetForm() {
       numDrawers: 1,
     },
   });
-
-  useEffect(() => {
-    if (globalError.active && globalError.scope === "ADD CABINET") {
-      setError(globalError.message);
-      dispatch(clearError());
-    }
-  }, [globalError]);
 
   const { onClose } = useModalContext();
   const submitForm = async (data) => {

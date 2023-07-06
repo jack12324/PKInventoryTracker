@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Button,
@@ -17,13 +16,13 @@ import {
 import { successToast } from "../alerts/Toasts";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { editItem } from "../../reducers/itemsReducer";
+import { useGlobalError } from "../../hooks";
 
 function ModalEditItemForm({ item }) {
-  const globalError = useSelector((state) => state.error);
   const cabinets = useSelector((state) => state.cabinets);
   const drawers = useSelector((state) => state.drawers);
   const drawer = drawers.find((d) => d.id === item.drawer);
-  const [error, setError] = useState("");
+  const [error, setError] = useGlobalError("EDIT ITEM");
   const {
     register,
     handleSubmit,
@@ -36,12 +35,6 @@ function ModalEditItemForm({ item }) {
       drawer: item.drawer,
     },
   });
-
-  useEffect(() => {
-    if (globalError.active && globalError.scope === "EDIT ITEM") {
-      setError(globalError.message);
-    }
-  }, [globalError]);
 
   const watchCabinet = watch("cabinet", null);
   const filteredDrawers = drawers
