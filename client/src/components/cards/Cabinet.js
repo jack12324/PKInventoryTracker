@@ -8,10 +8,9 @@ import {
   useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { EditIcon } from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import ConfirmAlert from "../alerts/ConfirmAlert";
 import { removeCabinet } from "../../reducers/cabinetsReducer";
 import ModalWrapper from "../forms/ModalWrapper";
 import ModalEditCabinetForm from "../forms/ModalEditCabinetForm";
@@ -19,15 +18,11 @@ import Drawer from "./Drawer";
 import ShowHideIconButton from "../misc/ShowHideIconButton";
 import AddHandler from "../forms/AddHandler";
 import ModalDrawerForm from "../forms/ModalDrawerForm";
+import DeleteButton from "../misc/DeleteButton";
 
 function Cabinet({ cabinet }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { isOpen, onToggle } = useDisclosure();
-  const {
-    isOpen: isConfirmOpen,
-    onOpen: onConfirmOpen,
-    onClose: onConfirmClose,
-  } = useDisclosure();
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -54,20 +49,6 @@ function Cabinet({ cabinet }) {
       >
         <ModalEditCabinetForm cabinet={cabinet} />
       </ModalWrapper>
-
-      {isConfirmOpen && (
-        <ConfirmAlert
-          onClose={onConfirmClose}
-          isOpen={isConfirmOpen}
-          header="Delete Cabinet"
-          body={
-            "You are about to delete a cabinet. All of its contents will also be deleted. You can't undo this action"
-          }
-          confirmText="Delete"
-          confirmed={handleDelete}
-          isSubmitting={isDeleting}
-        />
-      )}
       <Box p={2} shadow="md" borderWidth="1px" w="100%">
         <HStack justify="space-between">
           <Text>{cabinet.name}</Text>
@@ -78,11 +59,13 @@ function Cabinet({ cabinet }) {
               icon={<EditIcon />}
               onClick={onEditOpen}
             />
-            <IconButton
-              aria-label="Delete cabinet"
-              icon={<DeleteIcon />}
-              colorScheme="red"
-              onClick={onConfirmOpen}
+            <DeleteButton
+              isDeleting={isDeleting}
+              name="Cabinet"
+              body={
+                "You are about to delete a cabinet. All of its contents will also be deleted. You can't undo this action"
+              }
+              handleDelete={handleDelete}
             />
           </HStack>
         </HStack>
