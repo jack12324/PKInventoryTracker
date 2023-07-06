@@ -1,11 +1,13 @@
 import { IconButton, useDisclosure } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 import ModalWrapper from "../forms/ModalWrapper";
 
 function EditButton({ name, children }) {
   const { onOpen, onClose, isOpen } = useDisclosure();
-  return (
+  const user = useSelector((state) => state.user);
+  return user.admin ? (
     <>
       <ModalWrapper onClose={onClose} isOpen={isOpen} heading={`Edit ${name}`}>
         {children}
@@ -16,7 +18,7 @@ function EditButton({ name, children }) {
         onClick={onOpen}
       />
     </>
-  );
+  ) : null;
 }
 
 EditButton.propTypes = {

@@ -1,11 +1,13 @@
 import { Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 import ModalWrapper from "./ModalWrapper";
 
 function AddHandler({ addName, children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  return (
+  const user = useSelector((state) => state.user);
+  return user.admin ? (
     <>
       <Button rightIcon={<AddIcon />} variant="solid" onClick={onOpen} w="100%">
         Add {addName}
@@ -18,7 +20,7 @@ function AddHandler({ addName, children }) {
         {children}
       </ModalWrapper>
     </>
-  );
+  ) : null;
 }
 
 AddHandler.propTypes = {

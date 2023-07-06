@@ -1,11 +1,13 @@
 import { IconButton, useDisclosure } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 
 function DeleteButton({ name, handleDelete, isDeleting, body }) {
   const { isOpen, onClose, onOpen } = useDisclosure();
-  return (
+  const user = useSelector((state) => state.user);
+  return user.admin ? (
     <>
       {isOpen && (
         <ConfirmAlert
@@ -25,7 +27,7 @@ function DeleteButton({ name, handleDelete, isDeleting, body }) {
         onClick={onOpen}
       />
     </>
-  );
+  ) : null;
 }
 
 DeleteButton.propTypes = {
