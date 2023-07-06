@@ -9,10 +9,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { createSelector } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import store from "../../store";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 import { removeCabinet } from "../../reducers/cabinetsReducer";
 import ModalWrapper from "../forms/ModalWrapper";
@@ -35,14 +33,10 @@ function Cabinet({ cabinet }) {
     onOpen: onEditOpen,
     onClose: onEditClose,
   } = useDisclosure();
-  const getDrawers = createSelector(
-    (state) => state?.drawers,
-    (drawers) =>
-      [...drawers.filter((d) => d.cabinet === cabinet.id)].sort(
-        (a, b) => b.position - a.position
-      )
-  );
-  const drawers = getDrawers(store.getState());
+  const allDrawers = useSelector((state) => state.drawers);
+  const drawers = allDrawers
+    .filter((d) => d.cabinet === cabinet.id)
+    .sort((a, b) => b.position - a.position);
   const dispatch = useDispatch();
 
   const handleDelete = async () => {
