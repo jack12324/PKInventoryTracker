@@ -6,6 +6,8 @@ import {
   appendDrawerToCabinet,
   removeDrawerFromCabinet,
 } from "./cabinetsReducer";
+// eslint-disable-next-line import/no-cycle
+import { deleteItemsOfDrawerId } from "./itemsReducer";
 
 const drawersSlice = createSlice({
   name: "drawers",
@@ -27,6 +29,8 @@ const drawersSlice = createSlice({
     },
     deleteDrawer: (state, action) =>
       state.filter((d) => d.id !== action.payload.id),
+    deleteDrawersOfCabinetId: (state, action) =>
+      state.filter((d) => d.cabinet !== action.payload),
     updateDrawer: (state, action) =>
       state.map((d) => (d.id === action.payload.id ? action.payload : d)),
   },
@@ -39,6 +43,7 @@ export const {
   appendItemToDrawer,
   removeItemFromDrawer,
   deleteDrawer,
+  deleteDrawersOfCabinetId,
   updateDrawer,
 } = drawersSlice.actions;
 
@@ -69,6 +74,7 @@ export const removeDrawer = (drawerData) => async (dispatch) => {
     await drawersService.deleteDrawer(drawerData.id);
     dispatch(deleteDrawer(drawerData));
     dispatch(removeDrawerFromCabinet(drawerData));
+    dispatch(deleteItemsOfDrawerId(drawerData.id));
     return true;
   } catch (err) {
     dispatch(setError(err, "DELETE DRAWER"));

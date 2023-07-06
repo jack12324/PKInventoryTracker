@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import itemsService from "../services/items";
 import { setError } from "./errorReducer";
+// eslint-disable-next-line import/no-cycle
 import { appendItemToDrawer, removeItemFromDrawer } from "./drawersReducer";
 
 const itemsSlice = createSlice({
@@ -12,13 +13,21 @@ const itemsSlice = createSlice({
     appendItem: (state, action) => state.concat(action.payload),
     deleteItem: (state, action) =>
       state.filter((i) => i.id !== action.payload.id),
+    deleteItemsOfDrawerId: (state, action) =>
+      state.filter((i) => i.drawer !== action.payload),
     updateItem: (state, action) =>
       state.map((i) => (i.id === action.payload.id ? action.payload : i)),
   },
 });
 
-export const { setItems, clearItems, appendItem, deleteItem, updateItem } =
-  itemsSlice.actions;
+export const {
+  setItems,
+  clearItems,
+  appendItem,
+  deleteItem,
+  updateItem,
+  deleteItemsOfDrawerId,
+} = itemsSlice.actions;
 
 export const initializeItems = () => async (dispatch) => {
   try {

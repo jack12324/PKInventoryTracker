@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import cabinetsService from "../services/cabinets";
 import { setError } from "./errorReducer";
 // eslint-disable-next-line import/no-cycle
-import { initializeDrawers } from "./drawersReducer";
+import { deleteDrawersOfCabinetId, initializeDrawers } from "./drawersReducer";
+import { deleteItemsOfDrawerId } from "./itemsReducer";
 
 const cabinetsSlice = createSlice({
   name: "cabinets",
@@ -70,6 +71,8 @@ export const removeCabinet = (cabinetData) => async (dispatch) => {
   try {
     await cabinetsService.deleteCabinet(cabinetData.id);
     dispatch(deleteCabinet(cabinetData.id));
+    dispatch(deleteDrawersOfCabinetId(cabinetData.id));
+    cabinetData.drawers.forEach((d) => dispatch(deleteItemsOfDrawerId(d)));
     return true;
   } catch (err) {
     dispatch(setError(err, "DELETE CABINET"));
