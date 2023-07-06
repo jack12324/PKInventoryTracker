@@ -16,12 +16,14 @@ import { useEffect, useState } from "react";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
 import { addDrawer } from "../../reducers/drawersReducer";
+import { clearError } from "../../reducers/errorReducer";
 
 function ModalDrawerForm() {
   const globalError = useSelector((state) => state.error);
   const cabinets = useSelector((state) => state.cabinets);
   const drawers = useSelector((state) => state.drawers);
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -36,20 +38,20 @@ function ModalDrawerForm() {
   useEffect(() => {
     if (globalError.active && globalError.scope === "ADD DRAWER") {
       setError(globalError.message);
+      dispatch(clearError());
     }
   }, [globalError]);
 
-  const dispatch = useDispatch();
   const { onClose } = useModalContext();
   const submitForm = async (data) => {
     setError("");
-    const cabinet = cabinets.find((c) => c.id === data.cabinet);
     const position =
       1 +
       Math.max(
-        ...cabinet.drawers.map(
-          (cd) => drawers.find((d) => d.id === cd).position
-        )
+        0,
+        ...drawers
+          .filter((d) => d.cabinet === data.cabinet)
+          .map((d) => d.position)
       );
     const success = await dispatch(addDrawer({ ...data, position }));
     if (success) {

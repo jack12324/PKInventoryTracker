@@ -4,10 +4,16 @@ import {
   Button,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Input,
   ModalBody,
   ModalFooter,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
   Select,
   useModalContext,
 } from "@chakra-ui/react";
@@ -26,6 +32,7 @@ function ModalEditDrawerForm({ drawer }) {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -87,6 +94,49 @@ function ModalEditDrawerForm({ drawer }) {
           </Select>
           <FormErrorMessage>
             {errors.cabinet && errors.cabinet.message}
+          </FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={errors.position} isRequired>
+          <FormLabel htmlFor="position">Drawer Position</FormLabel>
+          <NumberInput
+            min={1}
+            max={25}
+            defaultValue={drawer.position}
+            clampValueOnBlur={false}
+            onChange={(value) => {
+              setValue("position", value);
+            }}
+          >
+            <NumberInputField
+              id="position"
+              placeholder="Position of drawer in cabinet"
+              {...register("position", {
+                required: "Position is required",
+                valueAsNumber: true,
+                validate: (value) =>
+                  (Number.isInteger(parseFloat(value, 10)) &&
+                    parseInt(value, 10) > 0) ||
+                  "Position must be a positive integer",
+                min: {
+                  value: 1,
+                  message: "Position must be at least one",
+                },
+                max: {
+                  value: 25,
+                  message: "Position must be at most 25",
+                },
+              })}
+            />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <FormHelperText>
+            A position of 1 indicates the bottom drawer
+          </FormHelperText>
+          <FormErrorMessage>
+            {errors.position && errors.position.message}
           </FormErrorMessage>
         </FormControl>
       </ModalBody>
