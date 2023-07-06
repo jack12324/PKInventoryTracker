@@ -9,9 +9,7 @@ const itemsSlice = createSlice({
   reducers: {
     setItems: (state, action) => action.payload,
     clearItems: () => [],
-    appendItem: (state, action) => {
-      state.push(action.payload);
-    },
+    appendItem: (state, action) => state.concat(action.payload),
     deleteItem: (state, action) =>
       state.filter((i) => i.id !== action.payload.id),
     updateItem: (state, action) =>

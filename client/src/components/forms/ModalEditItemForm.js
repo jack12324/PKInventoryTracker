@@ -17,6 +17,7 @@ import { successToast } from "../alerts/Toasts";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { editItem } from "../../reducers/itemsReducer";
 import { useGlobalError } from "../../hooks";
+import DrawerSelector from "./fields/DrawerSelector";
 
 function ModalEditItemForm({ item }) {
   const cabinets = useSelector((state) => state.cabinets);
@@ -27,6 +28,7 @@ function ModalEditItemForm({ item }) {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -37,11 +39,6 @@ function ModalEditItemForm({ item }) {
   });
 
   const watchCabinet = watch("cabinet", null);
-  const filteredDrawers = drawers
-    .filter((d) =>
-      cabinets.find((c) => c.id === watchCabinet)?.drawers?.includes(d.id)
-    )
-    ?.sort((a, b) => b.position - a.position);
 
   const dispatch = useDispatch();
   const { onClose } = useModalContext();
@@ -91,27 +88,11 @@ function ModalEditItemForm({ item }) {
             {errors.cabinet && errors.cabinet.message}
           </FormErrorMessage>
         </FormControl>
-        <FormControl
-          isInvalid={errors.drawer}
-          isRequired
-          isDisabled={!watchCabinet}
-        >
-          <FormLabel htmlFor="drawer">Drawer</FormLabel>
-          <Select
-            id="drawer"
-            {...register("drawer", { required: "Drawer is required" })}
-          >
-            {filteredDrawers.map((d) => (
-              <option key={d.id} value={d.id}>
-                {`Drawer ${d.position}`}
-                {d.name ? ` - ${d.name}` : ""}
-              </option>
-            ))}
-          </Select>
-          <FormErrorMessage>
-            {errors.drawer && errors.drawer.message}
-          </FormErrorMessage>
-        </FormControl>
+        <DrawerSelector
+          error={errors.drawer}
+          cabinetId={watchCabinet}
+          control={control}
+        />
       </ModalBody>
       <ModalFooter>
         <Button

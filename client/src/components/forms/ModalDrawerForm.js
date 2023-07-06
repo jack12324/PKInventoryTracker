@@ -12,12 +12,13 @@ import {
   useModalContext,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
 import { addDrawer } from "../../reducers/drawersReducer";
 import { useGlobalError } from "../../hooks";
 
-function ModalDrawerForm() {
+function ModalDrawerForm({ cabinet }) {
   const cabinets = useSelector((state) => state.cabinets);
   const drawers = useSelector((state) => state.drawers);
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ function ModalDrawerForm() {
   } = useForm({
     defaultValues: {
       name: "",
-      cabinet: null,
+      cabinet: cabinet?.id,
     },
   });
 
@@ -92,5 +93,14 @@ function ModalDrawerForm() {
     </form>
   );
 }
+
+ModalDrawerForm.propTypes = {
+  cabinet: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }),
+};
+ModalDrawerForm.defaultProps = {
+  cabinet: null,
+};
 
 export default ModalDrawerForm;

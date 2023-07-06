@@ -7,7 +7,7 @@ function AddHandler({ addName, children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <Button rightIcon={<AddIcon />} variant="solid" onClick={onOpen}>
+      <Button rightIcon={<AddIcon />} variant="solid" onClick={onOpen} w="100%">
         Add {addName}
       </Button>
       <ModalWrapper

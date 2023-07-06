@@ -9,16 +9,16 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { createSelector } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import store from "../../store";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 import ModalWrapper from "../forms/ModalWrapper";
 import { removeDrawer } from "../../reducers/drawersReducer";
 import ModalEditDrawerForm from "../forms/ModalEditDrawerForm";
 import Item from "./Item";
 import ShowHideIconButton from "../misc/ShowHideIconButton";
+import AddHandler from "../forms/AddHandler";
+import ModalItemForm from "../forms/ModalItemForm";
 
 function Drawer({ drawer }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -33,14 +33,12 @@ function Drawer({ drawer }) {
     onOpen: onEditOpen,
     onClose: onEditClose,
   } = useDisclosure();
-  const getItems = createSelector(
-    (state) => state?.items,
-    (items) =>
-      [...items.filter((i) => i.drawer === drawer.id)].sort((a, b) =>
-        b.name > a.name ? 1 : -1
-      )
-  );
-  const items = getItems(store.getState());
+
+  const allItems = useSelector((state) => state.items);
+  const items = allItems
+    .filter((i) => i.drawer === drawer.id)
+    .sort((a, b) => (b.name > a.name ? -1 : 1));
+
   const dispatch = useDispatch();
 
   const handleDelete = async () => {
@@ -95,11 +93,12 @@ function Drawer({ drawer }) {
         </HStack>
         <Collapse in={isOpen} animateOpacity>
           <VStack p={4}>
-            {items && items.length > 0 ? (
-              items.map((i) => <Item item={i} key={i.id} />)
-            ) : (
-              <Text>Drawer is Empty</Text>
-            )}
+            <AddHandler addName="Item">
+              <ModalItemForm drawer={drawer} />
+            </AddHandler>
+            {items && items.length > 0
+              ? items.map((i) => <Item item={i} key={i.id} />)
+              : null}
           </VStack>
         </Collapse>
       </Box>

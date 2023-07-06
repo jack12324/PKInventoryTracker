@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../reducers/userReducer";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
-import PasswordInput from "./PasswordInput";
+import PasswordInput from "./fields/PasswordInput";
 
 function LoginForm() {
   const [error, setError] = useState("");

@@ -12,7 +12,7 @@ import { useState } from "react";
 import usersService from "../../services/users";
 import { successToast } from "../alerts/Toasts";
 import ErrorAlert from "../alerts/ErrorAlert";
-import PasswordInput from "./PasswordInput";
+import PasswordInput from "./fields/PasswordInput";
 
 function SignupForm() {
   const [error, setError] = useState("");

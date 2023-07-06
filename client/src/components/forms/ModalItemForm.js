@@ -12,34 +12,31 @@ import {
   useModalContext,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
 import { addItem } from "../../reducers/itemsReducer";
 import { useGlobalError } from "../../hooks";
+import DrawerSelector from "./fields/DrawerSelector";
 
-function ModalItemForm() {
+function ModalItemForm({ drawer }) {
   const cabinets = useSelector((state) => state.cabinets);
-  const drawers = useSelector((state) => state.drawers);
   const [error, setError] = useGlobalError("ADD ITEM");
   const {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       name: "",
-      cabinet: null,
-      drawer: null,
+      cabinet: drawer?.cabinet,
+      drawer: drawer?.id,
     },
   });
 
   const watchCabinet = watch("cabinet", null);
-  const filteredDrawers = drawers
-    .filter((d) =>
-      cabinets.find((c) => c.id === watchCabinet)?.drawers?.includes(d.id)
-    )
-    ?.sort((a, b) => b.position - a.position);
 
   const dispatch = useDispatch();
   const { onClose } = useModalContext();
@@ -84,27 +81,11 @@ function ModalItemForm() {
             {errors.cabinet && errors.cabinet.message}
           </FormErrorMessage>
         </FormControl>
-        <FormControl
-          isInvalid={errors.drawer}
-          isRequired
-          isDisabled={!watchCabinet}
-        >
-          <FormLabel htmlFor="drawer">Drawer</FormLabel>
-          <Select
-            placeholder="Select Drawer"
-            id="drawer"
-            {...register("drawer", { required: "Drawer is required" })}
-          >
-            {filteredDrawers.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.position}
-              </option>
-            ))}
-          </Select>
-          <FormErrorMessage>
-            {errors.drawer && errors.drawer.message}
-          </FormErrorMessage>
-        </FormControl>
+        <DrawerSelector
+          cabinetId={watchCabinet}
+          error={errors.drawer}
+          control={control}
+        />
       </ModalBody>
       <ModalFooter>
         <Button isLoading={isSubmitting} type="submit">
@@ -114,5 +95,16 @@ function ModalItemForm() {
     </form>
   );
 }
+
+ModalItemForm.propTypes = {
+  drawer: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    cabinet: PropTypes.string.isRequired,
+  }),
+};
+
+ModalItemForm.defaultProps = {
+  drawer: null,
+};
 
 export default ModalItemForm;

@@ -19,6 +19,8 @@ import ModalWrapper from "../forms/ModalWrapper";
 import ModalEditCabinetForm from "../forms/ModalEditCabinetForm";
 import Drawer from "./Drawer";
 import ShowHideIconButton from "../misc/ShowHideIconButton";
+import AddHandler from "../forms/AddHandler";
+import ModalDrawerForm from "../forms/ModalDrawerForm";
 
 function Cabinet({ cabinet }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -92,11 +94,12 @@ function Cabinet({ cabinet }) {
         </HStack>
         <Collapse in={isOpen} animateOpacity>
           <VStack p={4}>
-            {drawers && drawers.length > 0 ? (
-              drawers.map((d) => <Drawer drawer={d} key={d.id} />)
-            ) : (
-              <Text>Cabinet is Empty</Text>
-            )}
+            <AddHandler addName="Drawer">
+              <ModalDrawerForm cabinet={cabinet} />
+            </AddHandler>
+            {drawers && drawers.length > 0
+              ? drawers.map((d) => <Drawer drawer={d} key={d.id} />)
+              : null}
           </VStack>
         </Collapse>
       </Box>
