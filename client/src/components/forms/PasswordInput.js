@@ -14,8 +14,8 @@ function PasswordInput({ options, register }) {
         /* eslint-disable-next-line react/jsx-props-no-spreading */
         {...register("password", options)}
       />
-      <InputRightElement>
-        <Button onClick={() => setShowPassword(!showPassword)}>
+      <InputRightElement w="5em">
+        <Button onClick={() => setShowPassword(!showPassword)} h="80%">
           {showPassword ? "Hide" : "Show"}
         </Button>
       </InputRightElement>
