@@ -10,7 +10,7 @@ function ItemsPage() {
   return (
     <>
       <Heading>Items</Heading>
-      {items ? items.map((i) => <Item item={i} key={i.id} />) : null}
+      {items ? items.map((i) => <Item item={i} key={i.id} verbose />) : null}
     </>
   );
 }
