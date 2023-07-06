@@ -21,6 +21,10 @@ const drawersSlice = createSlice({
         .find((d) => d.id === action.payload.drawer)
         .items.push(action.payload.item);
     },
+    removeItemFromDrawer: (state, action) => {
+      const drawer = state.find((d) => d.id === action.payload.drawer);
+      drawer.items = drawer.items.filter((i) => i !== action.payload.id);
+    },
     deleteDrawer: (state, action) =>
       state.filter((d) => d.id !== action.payload.id),
     updateDrawer: (state, action) =>
@@ -33,6 +37,7 @@ export const {
   clearDrawers,
   appendDrawer,
   appendItemToDrawer,
+  removeItemFromDrawer,
   deleteDrawer,
   updateDrawer,
 } = drawersSlice.actions;

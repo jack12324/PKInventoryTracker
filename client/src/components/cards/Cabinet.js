@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import {
   Box,
-  Button,
   Collapse,
   HStack,
   IconButton,
@@ -19,6 +18,7 @@ import { removeCabinet } from "../../reducers/cabinetsReducer";
 import ModalWrapper from "../forms/ModalWrapper";
 import ModalEditCabinetForm from "../forms/ModalEditCabinetForm";
 import Drawer from "./Drawer";
+import ShowHideIconButton from "../misc/ShowHideIconButton";
 
 function Cabinet({ cabinet }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -76,9 +76,7 @@ function Cabinet({ cabinet }) {
         <HStack justify="space-between">
           <Text>{cabinet.name}</Text>
           <HStack justify="space-between">
-            <Button onClick={onToggle}>
-              {isOpen ? "Hide Contents" : "Show Contents"}
-            </Button>
+            <ShowHideIconButton onToggle={onToggle} isOpen={isOpen} />
             <IconButton
               aria-label="Edit cabinet name"
               icon={<EditIcon />}

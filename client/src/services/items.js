@@ -13,6 +13,19 @@ const addItem = async (drawerData) => {
   return response.data;
 };
 
-const itemsService = { getItems, addItem };
+const deleteItem = async (id) => {
+  const response = await axios.delete(`${URL}/${id}`, tokenHelper.getConfig());
+  return response.data;
+};
+
+const updateItem = async (id, data) => {
+  const response = await axios.put(
+    `${URL}/${id}`,
+    data,
+    tokenHelper.getConfig()
+  );
+  return response.data;
+};
+const itemsService = { getItems, addItem, deleteItem, updateItem };
 
 export default itemsService;

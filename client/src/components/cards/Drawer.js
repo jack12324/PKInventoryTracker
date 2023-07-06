@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import {
   Box,
-  Button,
   Collapse,
   HStack,
   IconButton,
   Text,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { createSelector } from "@reduxjs/toolkit";
@@ -17,6 +17,8 @@ import ConfirmAlert from "../alerts/ConfirmAlert";
 import ModalWrapper from "../forms/ModalWrapper";
 import { removeDrawer } from "../../reducers/drawersReducer";
 import ModalEditDrawerForm from "../forms/ModalEditDrawerForm";
+import Item from "./Item";
+import ShowHideIconButton from "../misc/ShowHideIconButton";
 
 function Drawer({ drawer }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -77,9 +79,7 @@ function Drawer({ drawer }) {
             {drawer.name ? ` - ${drawer.name}` : ""}
           </Text>
           <HStack justify="space-between">
-            <Button onClick={onToggle}>
-              {isOpen ? "Hide Contents" : "Show Contents"}
-            </Button>
+            <ShowHideIconButton onToggle={onToggle} isOpen={isOpen} />
             <IconButton
               aria-label="Edit drawer"
               icon={<EditIcon />}
@@ -94,12 +94,13 @@ function Drawer({ drawer }) {
           </HStack>
         </HStack>
         <Collapse in={isOpen} animateOpacity>
-          {items && items.length > 0 ? (
-            items.map((i) => <Text key={i.id}>{i.name}</Text>)
-          ) : (
-            <Text>Drawer is Empty</Text>
-          )}
-          <Box />
+          <VStack p={4}>
+            {items && items.length > 0 ? (
+              items.map((i) => <Item item={i} key={i.id} />)
+            ) : (
+              <Text>Drawer is Empty</Text>
+            )}
+          </VStack>
         </Collapse>
       </Box>
     </>

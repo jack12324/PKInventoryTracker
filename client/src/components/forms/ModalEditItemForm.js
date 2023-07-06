@@ -1,4 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Button,
@@ -11,16 +14,15 @@ import {
   Select,
   useModalContext,
 } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import ErrorAlert from "../alerts/ErrorAlert";
 import { successToast } from "../alerts/Toasts";
-import { addItem } from "../../reducers/itemsReducer";
+import ErrorAlert from "../alerts/ErrorAlert";
+import { editItem } from "../../reducers/itemsReducer";
 
-function ModalItemForm() {
+function ModalEditItemForm({ item }) {
   const globalError = useSelector((state) => state.error);
   const cabinets = useSelector((state) => state.cabinets);
   const drawers = useSelector((state) => state.drawers);
+  const drawer = drawers.find((d) => d.id === item.drawer);
   const [error, setError] = useState("");
   const {
     register,
@@ -29,11 +31,17 @@ function ModalItemForm() {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      name: "",
-      cabinet: null,
-      drawer: null,
+      name: item.name,
+      cabinet: drawer.cabinet,
+      drawer: item.drawer,
     },
   });
+
+  useEffect(() => {
+    if (globalError.active && globalError.scope === "EDIT ITEM") {
+      setError(globalError.message);
+    }
+  }, [globalError]);
 
   const watchCabinet = watch("cabinet", null);
   const filteredDrawers = drawers
@@ -42,22 +50,21 @@ function ModalItemForm() {
     )
     ?.sort((a, b) => b.position - a.position);
 
-  useEffect(() => {
-    if (globalError.active && globalError.scope === "ADD ITEM") {
-      setError(globalError.message);
-    }
-  }, [globalError]);
-
   const dispatch = useDispatch();
   const { onClose } = useModalContext();
   const submitForm = async (data) => {
     setError("");
-    const success = await dispatch(addItem(data));
+    const success = await dispatch(editItem(item, { ...item, ...data }));
     if (success) {
-      successToast(`Added item ${data.name}`);
+      successToast(`Updated item`);
       onClose();
     }
   };
+
+  const anyChange = () =>
+    watch("name") !== item.name ||
+    watch("cabinet") !== drawer.cabinet ||
+    watch("drawer") !== item.drawer;
 
   return (
     <form onSubmit={handleSubmit(submitForm)}>
@@ -67,7 +74,7 @@ function ModalItemForm() {
           <FormLabel htmlFor="name">Name</FormLabel>
           <Input
             id="name"
-            placeholder="Enter a name"
+            placeholder="Enter a name for the item"
             {...register("name", { required: "Name is required" })}
           />
           <FormErrorMessage>
@@ -77,8 +84,8 @@ function ModalItemForm() {
         <FormControl isInvalid={errors.cabinet} isRequired>
           <FormLabel htmlFor="cabinet">Cabinet</FormLabel>
           <Select
-            placeholder="Select Cabinet"
             id="cabinet"
+            placeholder="Select a cabinet"
             {...register("cabinet", { required: "Cabinet is required" })}
           >
             {cabinets.map((c) => (
@@ -98,13 +105,13 @@ function ModalItemForm() {
         >
           <FormLabel htmlFor="drawer">Drawer</FormLabel>
           <Select
-            placeholder="Select Drawer"
             id="drawer"
             {...register("drawer", { required: "Drawer is required" })}
           >
             {filteredDrawers.map((d) => (
               <option key={d.id} value={d.id}>
-                {d.position}
+                {`Drawer ${d.position}`}
+                {d.name ? ` - ${d.name}` : ""}
               </option>
             ))}
           </Select>
@@ -114,7 +121,11 @@ function ModalItemForm() {
         </FormControl>
       </ModalBody>
       <ModalFooter>
-        <Button isLoading={isSubmitting} type="submit">
+        <Button
+          isLoading={isSubmitting}
+          type="submit"
+          isDisabled={!anyChange()}
+        >
           Submit
         </Button>
       </ModalFooter>
@@ -122,4 +133,12 @@ function ModalItemForm() {
   );
 }
 
-export default ModalItemForm;
+ModalEditItemForm.propTypes = {
+  item: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    drawer: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
+export default ModalEditItemForm;
