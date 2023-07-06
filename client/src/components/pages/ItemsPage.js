@@ -10,12 +10,12 @@ import { SearchIcon } from "@chakra-ui/icons";
 import Item from "../cards/Item";
 
 function ItemsPage() {
-  const allItems = useSelector((state) =>
-    [...state.items].sort((a, b) => (a.name > b.name ? 1 : -1))
-  );
+  const allItems = useSelector((state) => state.items);
   const [search, setSearch] = useState("");
   const items = search
-    ? allItems.filter((i) => i.name.includes(search))
+    ? allItems
+        .filter((i) => i.name.includes(search))
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
     : allItems;
   return (
     <>
