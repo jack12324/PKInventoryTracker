@@ -14,7 +14,7 @@ function ItemsPage() {
   const [search, setSearch] = useState("");
   const items = search
     ? allItems
-        .filter((i) => i.name.includes(search))
+        .filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => (a.name > b.name ? 1 : -1))
     : allItems;
   return (
