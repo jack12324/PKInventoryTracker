@@ -1,0 +1,26 @@
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '19.8.1'
+      - name: Install Dependencies
+        run: npm install concurrently && npm run install:all
+      - name: Backend Tests
+        run: npm test
+        env:
+          MONGODB_URI_BASE: ${{secrets.TEST_MONGODB_URI}}
+          SECRET: ${{secrets.TESTING_SECRET}}
