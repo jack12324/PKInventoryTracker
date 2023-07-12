@@ -109,10 +109,8 @@ export const setError =
         errorSlice.actions.setError(createError(error.response.data, area))
       );
     } else if (error.message) {
-      console.error(error);
       dispatch(errorSlice.actions.setError(createError(error.message, area)));
     } else {
-      console.error(error);
       dispatch(errorSlice.actions.setError(createError("unknown error", area)));
     }
   };
