@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '19.8.1'
       - name: Install Dependencies
-        run: npm run install:all
+        run: npm install concurrently && npm run install:all
       - name: Lint
         run: npm run lint
       - name: Build
