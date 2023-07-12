@@ -28,7 +28,7 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: ${{ github.ref }}
-          check-name: test
+          check-name: 'test'
           allowed-conclusions: success
           repo-token: ${{secrets.GITHUB_TOKEN}}
 
@@ -70,6 +70,7 @@ jobs:
         if: (github.event_name == 'push') && !(contains(join(github.event.commits.*.message), '#skip'))
   notify_discord:
     needs: [lint_build_deploy, test, tag_release]
+    if: always()
     runs-on: ubuntu-20.04
     steps:
       - name: Send Discord Notification
