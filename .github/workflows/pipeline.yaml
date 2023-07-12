@@ -18,16 +18,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '19.8.1'
-      - name: Root Dependencies
-        run: npm install
-      - name: Project Dependencies
+      - name: Install Dependencies
         run: npm run install:all
       - name: Lint
         run: npm run lint
       - name: Build
         run : npm run build
       - name: Backend Tests
-        run: npm run test:backend
+        run: npm test
         env:
           MONGO_URI_BASE: ${{secrets.TEST_MONGODB_URI}}
           SECRET: ${{secrets.TESTING_SECRET}}
