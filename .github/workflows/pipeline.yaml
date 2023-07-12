@@ -27,7 +27,7 @@ jobs:
       - name: Backend Tests
         run: npm test
         env:
-          MONGO_URI_BASE: ${{secrets.TEST_MONGODB_URI}}
+          MONGODB_URI_BASE: ${{secrets.TEST_MONGODB_URI}}
           SECRET: ${{secrets.TESTING_SECRET}}
       - name: Deploy
         id: deploy
