@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint_test_and_deploy:
+  lint_build_deploy:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -24,11 +24,14 @@ jobs:
         run: npm run lint
       - name: Build
         run : npm run build
-      - name: Backend Tests
-        run: npm test
-        env:
-          MONGODB_URI_BASE: ${{secrets.TEST_MONGODB_URI}}
-          SECRET: ${{secrets.TESTING_SECRET}}
+      - name: wait for tests
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: test
+          allowed-conclusions: success
+          repo-token: ${{secrets.GITHUB_TOKEN}}
+
       - name: Deploy
         id: deploy
         run: flyctl deploy --remote-only
@@ -40,13 +43,22 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         if: failure() && (steps.deploy.outcome == 'failure')
-      - name: Send Discord Notification
-        if: always()
-        uses: sarisia/actions-status-discord@v1
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          webhook: ${{secrets.DISCORD_WEBHOOK}}
+          node-version: '19.8.1'
+      - name: Install Dependencies
+        run: npm install concurrently && npm run install:all
+      - name: Backend Tests
+        run: npm test
+        env:
+          MONGODB_URI_BASE: ${{secrets.TEST_MONGODB_URI}}
+          SECRET: ${{secrets.TESTING_SECRET}}
   tag_release:
-    needs: [lint_test_and_deploy]
+    needs: [lint_build_deploy, test]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -56,3 +68,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
         if: (github.event_name == 'push') && !(contains(join(github.event.commits.*.message), '#skip'))
+  notify_discord:
+    needs: [lint_build_deploy, test, tag_release]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Send Discord Notification
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{secrets.DISCORD_WEBHOOK}}
