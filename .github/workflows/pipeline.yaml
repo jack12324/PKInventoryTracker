@@ -21,7 +21,7 @@ jobs:
       - name: Root Dependencies
         run: npm install
       - name: Project Dependencies
-        run: npm run install
+        run: npm run install:all
       - name: Lint
         run: npm run lint
       - name: Build
