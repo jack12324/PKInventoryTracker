@@ -62,7 +62,6 @@ jobs:
           DEFAULT_BUMP: patch
         if: (github.event_name == 'push') && !(contains(join(github.event.commits.*.message), '#skip'))
   notify_discord:
-    needs: [lint_build_deploy, tag_release]
     if: always()
     runs-on: ubuntu-20.04
     steps:
