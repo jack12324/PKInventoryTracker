@@ -44,7 +44,7 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         if: failure() && (steps.deploy.outcome == 'failure')
   tag_release:
-    needs: [lint_build_deploy, test]
+    needs: [lint_build_deploy]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
