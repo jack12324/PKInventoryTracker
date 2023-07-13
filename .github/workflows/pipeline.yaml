@@ -32,6 +32,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '19.8.1'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json 
+            client/package-lock.json
       - name: Install Dependencies
         run: npm install concurrently && npm run install:all
       - name: Backend Tests
@@ -48,6 +52,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '19.8.1'
+          cache: 'npm'
       - name: Install Dependencies
         run: npm install concurrently && npm run install:all
       - name: Lint
