@@ -24,7 +24,7 @@ function Cabinet({ cabinet }) {
   const allDrawers = useSelector((state) => state.drawers);
   const drawers = allDrawers
     .filter((d) => d.cabinet === cabinet.id)
-    .sort((a, b) => b.position - a.position);
+    .sort((a, b) => a.position - b.position);
   const dispatch = useDispatch();
 
   const handleDelete = async () => {
