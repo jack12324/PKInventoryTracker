@@ -95,8 +95,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-      - name: List contents
-        run: ls && ls build && ls output
       - name: Deploy
         id: deploy
         run: flyctl deploy --remote-only
