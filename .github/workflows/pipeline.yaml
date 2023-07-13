@@ -123,9 +123,11 @@ jobs:
     if: always()
     runs-on: ubuntu-20.04
     steps:
+      - name: Get workflow Conclusion
+        uses: technote-space/workflow-conclusion-action@v3
       - name: Send Discord Notification
         if: always()
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{secrets.DISCORD_WEBHOOK}}
-          status: ${{ ${{success()}} && 'success' || ${{failure()}} && 'failure' || 'cancelled'}}
+          status: ${{env.WORKFLOW_CONCLUSION}}
