@@ -126,7 +126,7 @@ function ModalEditDrawerForm({ drawer }) {
             </NumberInputStepper>
           </NumberInput>
           <FormHelperText>
-            A position of 1 indicates the bottom drawer
+            A position of 1 indicates the top drawer
           </FormHelperText>
           <FormErrorMessage>
             {errors.position && errors.position.message}

@@ -32,7 +32,7 @@ function Item({ item, verbose }) {
         <HStack justify="space-between">
           {verbose && cabinet && drawer ? (
             <VStack alignItems="left" pr={8}>
-              <Text>{`Cabinet ${cabinet.name}`}</Text>
+              <Text>{`${cabinet.name}`}</Text>
               <Text>{`Drawer ${drawer.position}${
                 drawer.name ? ` - ${drawer.name}` : ""
               }`}</Text>
