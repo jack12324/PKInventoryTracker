@@ -35,15 +35,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '19.8.1'
-      - name: Cache Dependencies
+      - name: Uncache Dependencies
         uses: actions/cache@v3
         with:
           key: npm-${{hashFiles('package-lock.json', 'client/package-lock.json')}}
           path: |
             node_modules
             client/node_modules
-      - name: Install Dependencies
-        run: npm install concurrently && npm run install:all
       - name: Backend Tests
         run: npm test
         env:
@@ -58,23 +56,22 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '19.8.1'
-      - name: Install Dependencies
-        run: npm install concurrently && npm run install:all
+      - name: Uncache Dependencies
+        uses: actions/cache@v3
+        with:
+          key: npm-${{hashFiles('package-lock.json', 'client/package-lock.json')}}
+          path: |
+            node_modules
+            client/node_modules
       - name: Lint
         run: npm run lint
       - name: Build
         run : npm run build
-      - name: Deploy
-        id: deploy
-        run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{secrets.FLY_API_TOKEN}}
-        if: (github.event_name == 'push') && !(contains(join(github.event.commits.*.message), '#skip'))
-      - name: Rollback
-        run: cd backend && flyctl deploy -i `flyctl releases -j | jq ".[1].ImageRef" -r` --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        if: failure() && (steps.deploy.outcome == 'failure')
+      - name: Upload Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build
   deploy:
     needs: [lint_and_build, test]
     if: (github.event_name == 'push') && !(contains(join(github.event.commits.*.message), '#skip'))
@@ -85,10 +82,17 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '19.8.1'
-      - name: Install Dependencies
-        run: npm install concurrently && npm run install:all
-      - name: Build
-        run : npm run build
+      - name: Uncache Dependencies
+        uses: actions/cache@v3
+        with:
+          key: npm-${{hashFiles('package-lock.json', 'client/package-lock.json')}}
+          path: |
+            node_modules
+            client/node_modules
+      - name: Download Build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
       - name: Deploy
         id: deploy
         run: flyctl deploy --remote-only
