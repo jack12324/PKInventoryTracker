@@ -8,7 +8,7 @@
     "dev": "cross-env NODE_ENV=dev nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --verbose",
     "build": "cd client && rm -rf build && npm run build && cd .. && rm -rf build && cp -r client/build .",
-    "install": "concurrently \"npm install\" \"cd client && npm install\"",
+    "install:all": "concurrently \"npm install\" \"cd client && npm install\"",
     "lint": "eslint ."
   },
   "jest": {
