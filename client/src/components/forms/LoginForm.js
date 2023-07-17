@@ -6,6 +6,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  VStack,
 } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -43,7 +44,7 @@ function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(submitForm)}>
+    <VStack as="form" onSubmit={handleSubmit(submitForm)} spacing={4}>
       {error && <ErrorAlert msg={error} />}
       <FormControl isInvalid={errors.username}>
         <FormLabel htmlFor="username">Username</FormLabel>
@@ -66,10 +67,15 @@ function LoginForm() {
           {errors.password && errors.password.message}
         </FormErrorMessage>
       </FormControl>
-      <Button isLoading={isSubmitting} type="submit">
+      <Button
+        isLoading={isSubmitting}
+        type="submit"
+        colorScheme="brand"
+        w="100%"
+      >
         Log in
       </Button>
-    </form>
+    </VStack>
   );
 }
 

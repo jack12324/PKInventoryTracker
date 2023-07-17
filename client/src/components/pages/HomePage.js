@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import {
+  Container,
   Heading,
   Tab,
   TabList,
@@ -8,6 +9,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useTheme,
   VStack,
 } from "@chakra-ui/react";
 import NavBar from "../Navigation/NavBar";
@@ -19,11 +21,12 @@ import ItemsPage from "./ItemsPage";
 function HomePage() {
   const user = useSelector((state) => state.user);
   const cabinets = useSelector((state) => state.cabinets);
+  const theme = useTheme();
 
   if (!user || user.initializing) return null;
 
   return user.loggedIn ? (
-    <>
+    <Container w={{ xl: theme.breakpoints.xl }} maxW="100%">
       <NavBar />
       <Tabs>
         <TabList>
@@ -51,7 +54,7 @@ function HomePage() {
           </TabPanel>
         </TabPanels>
       </Tabs>
-    </>
+    </Container>
   ) : (
     <Navigate to="/login" />
   );
