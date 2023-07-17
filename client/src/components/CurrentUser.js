@@ -46,7 +46,13 @@ function CurrentUser() {
       </MenuButton>
       <MenuList>
         <Center>
-          <Button variant="outline" fontSize="lg" onClick={onLogout} w="90%">
+          <Button
+            size="sm"
+            variant="outline"
+            fontSize="sm"
+            onClick={onLogout}
+            w="90%"
+          >
             Log Out
           </Button>
         </Center>

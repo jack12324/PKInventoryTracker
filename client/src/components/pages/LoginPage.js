@@ -8,7 +8,7 @@ function LoginPage() {
   if (!user || user.initializing) return null;
 
   return user.loggedIn ? (
-    <Navigate to="/home" />
+    <Navigate to="/items" />
   ) : (
     <Center bg="gray.50" h="100vh">
       <VStack maxW="xl" w="100%">
