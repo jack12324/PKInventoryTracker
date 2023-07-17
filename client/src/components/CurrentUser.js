@@ -1,13 +1,22 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Button, HStack, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Button,
+  Center,
+  HStack,
+  Menu,
+  MenuButton,
+  MenuList,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { useCsrBreakpointValue } from "../hooks";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { logoutUser } from "../reducers/userReducer";
 import { successToast } from "./alerts/Toasts";
 
 function CurrentUser() {
   const user = useSelector((state) => state.user);
-  const isMobile = useCsrBreakpointValue({ base: true, md: false });
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -18,21 +27,31 @@ function CurrentUser() {
   };
 
   return (
-    <HStack justify="space-between" spacing="4" fontSize="lg">
-      {isMobile ? null : (
-        <Text color="grey.800" fontWeight="semibold">
-          Welcome {user.admin ? "admin" : ""} {user.username}!
-        </Text>
-      )}
-      <Button
-        variant="outline"
-        colorScheme="gray"
-        fontSize="lg"
-        onClick={onLogout}
-      >
-        Log Out
-      </Button>
-    </HStack>
+    <Menu>
+      <MenuButton>
+        <HStack>
+          <Avatar size="sm" />
+          <VStack alignItems="flex-start" ml={2} spacing="1px">
+            <Text fontSize="sm" fontWeight="semibold">
+              {user.username}
+            </Text>
+            {user.admin ? (
+              <Text fontSize="xs" color="gray.600">
+                admin
+              </Text>
+            ) : null}
+          </VStack>
+          <ChevronDownIcon />
+        </HStack>
+      </MenuButton>
+      <MenuList>
+        <Center>
+          <Button variant="outline" fontSize="lg" onClick={onLogout} w="90%">
+            Log Out
+          </Button>
+        </Center>
+      </MenuList>
+    </Menu>
   );
 }
 

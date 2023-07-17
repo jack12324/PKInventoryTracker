@@ -1,9 +1,10 @@
-import { HStack } from "@chakra-ui/react";
+import { Heading, HStack } from "@chakra-ui/react";
 import CurrentUser from "../CurrentUser";
 import { useCsrBreakpointValue } from "../../hooks";
+import Logo from "../icons/logo";
 
 function NavBar() {
-  const isMobile = useCsrBreakpointValue({ base: true, md: false });
+  const isMobile = useCsrBreakpointValue({ base: true, sm: false });
   return (
     <HStack
       as="nav"
@@ -14,15 +15,16 @@ function NavBar() {
       borderBottomWidth="1px"
     >
       {isMobile ? (
-        <HStack>
+        <>
+          <Logo boxSize={24} color="brand.400" />
           <CurrentUser />
-        </HStack>
+        </>
       ) : (
-        <HStack justify="space-between" spacing="8">
-          <HStack>
-            <CurrentUser />
-          </HStack>
-        </HStack>
+        <>
+          <Logo boxSize={24} color="brand.400" />
+          <Heading>P&K Inventory </Heading>
+          <CurrentUser />
+        </>
       )}
     </HStack>
   );
