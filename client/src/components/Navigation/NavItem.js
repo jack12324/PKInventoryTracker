@@ -1,14 +1,16 @@
 import { HStack, Icon, Link, Text } from "@chakra-ui/react";
 import { Link as ReactLink } from "react-router-dom";
 import PropTypes from "prop-types";
+import { linkObject } from "../../types";
 
-function NavItem({ linkObject }) {
+function NavItem({ linkItem, onClick }) {
   return (
     <Link
-      key={linkObject.name}
+      key={linkItem.name}
       as={ReactLink}
-      to={linkObject.dest}
+      to={linkItem.dest}
       style={{ textDecoration: "none" }}
+      onClick={onClick}
     >
       <HStack
         align="center"
@@ -26,27 +28,21 @@ function NavItem({ linkObject }) {
           _groupHover={{
             color: "white",
           }}
-          as={linkObject.icon}
+          as={linkItem.icon}
         />
-        <Text>{linkObject.name}</Text>
+        <Text>{linkItem.name}</Text>
       </HStack>
     </Link>
   );
 }
 
 NavItem.propTypes = {
-  linkObject: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    dest: PropTypes.string.isRequired,
-    icon: PropTypes.objectOf((prop) => {
-      if (!prop.displayName.includes("Icon")) {
-        return new Error(
-          `prop icon should be of type Icon. Got displayName: ${prop.displayName}`
-        );
-      }
-      return true;
-    }),
-  }).isRequired,
+  linkItem: linkObject.isRequired,
+  onClick: PropTypes.func,
+};
+
+NavItem.defaultProps = {
+  onClick: null,
 };
 
 export default NavItem;

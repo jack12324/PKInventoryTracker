@@ -1,4 +1,5 @@
 import { Icon } from "@chakra-ui/react";
+import PropTypes from "prop-types";
 
 function Logo(props) {
   return (
@@ -11,5 +12,17 @@ function Logo(props) {
     </Icon>
   );
 }
+
+Logo.propTypes = {
+  color: PropTypes.string,
+  w: PropTypes.number,
+  h: PropTypes.number,
+};
+
+Logo.defaultProps = {
+  color: "brand.400",
+  w: 24,
+  h: 12,
+};
 
 export default Logo;

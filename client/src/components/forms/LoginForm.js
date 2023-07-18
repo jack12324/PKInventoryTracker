@@ -37,7 +37,7 @@ function LoginForm() {
       await dispatch(loginUser(data));
       setError("");
       successToast("Log in successful");
-      navigate("/home");
+      navigate("/items");
     } catch (err) {
       setError("Invalid username or password");
     }

@@ -1,14 +1,15 @@
 import { Heading, HStack, IconButton } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
+import PropTypes from "prop-types";
 import CurrentUser from "../CurrentUser";
 import { useCsrBreakpointValue } from "../../hooks";
+import Logo from "../icons/logo";
 
-function NavBar() {
+function NavBar({ mobileOnOpen }) {
   const isMobile = useCsrBreakpointValue({ base: true, md: false });
   return (
     <HStack
       as="nav"
-      spacing={{ base: "8", sm: "10" }}
       justify="space-between"
       pt="2"
       pb="2"
@@ -17,7 +18,12 @@ function NavBar() {
     >
       {isMobile ? (
         <>
-          <IconButton aria-label="Open Nav Menu" icon={<HamburgerIcon />} />
+          <IconButton
+            aria-label="Open Nav Menu"
+            icon={<HamburgerIcon />}
+            onClick={mobileOnOpen}
+          />
+          <Logo />
           <CurrentUser />
         </>
       ) : (
@@ -30,4 +36,8 @@ function NavBar() {
     </HStack>
   );
 }
+
+NavBar.propTypes = {
+  mobileOnOpen: PropTypes.func.isRequired,
+};
 export default NavBar;

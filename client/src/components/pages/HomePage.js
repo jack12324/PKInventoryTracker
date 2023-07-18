@@ -1,18 +1,10 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import {
-  Container,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  useTheme,
-} from "@chakra-ui/react";
+import { Container, useTheme } from "@chakra-ui/react";
 import { SearchIcon, ViewIcon } from "@chakra-ui/icons";
 import ItemsPage from "./ItemsPage";
 import CabinetsPage from "./CabinetsPage";
-import SideBar from "../Navigation/SideBar";
+import SideBarWithNavBar from "../Navigation/SideBarWithNavBar";
 
 function HomePage() {
   const user = useSelector((state) => state.user);
@@ -36,21 +28,7 @@ function HomePage() {
 
   return user.loggedIn ? (
     <Container w={{ "2xl": theme.breakpoints["2xl"] }} maxW="100%">
-      <SideBar links={links} />
-      <Tabs>
-        <TabList>
-          <Tab>Items</Tab>
-          <Tab>Cabinets</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <ItemsPage />
-          </TabPanel>
-          <TabPanel>
-            <CabinetsPage />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <SideBarWithNavBar links={links} />
     </Container>
   ) : (
     <Navigate to="/login" />
