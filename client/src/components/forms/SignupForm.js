@@ -6,6 +6,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  VStack,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -40,13 +41,13 @@ function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(submitForm)}>
+    <VStack as="form" onSubmit={handleSubmit(submitForm)} spacing={4}>
       {error && <ErrorAlert msg={error} />}
       <FormControl isInvalid={errors.username}>
         <FormLabel htmlFor="username">Username</FormLabel>
         <Input
           id="username"
-          placeholder="Username"
+          placeholder="Enter Username"
           {...register("username", {
             required: "Username is required",
             minLength: {
@@ -75,10 +76,10 @@ function SignupForm() {
           {errors.password && errors.password.message}
         </FormErrorMessage>
       </FormControl>
-      <Button isLoading={isSubmitting} type="submit">
+      <Button isLoading={isSubmitting} type="submit" w="100%">
         Sign up
       </Button>
-    </form>
+    </VStack>
   );
 }
 

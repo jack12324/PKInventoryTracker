@@ -12,7 +12,7 @@ function ModalWrapper({ isOpen, onClose, heading, children }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent w="95%">
         <ModalHeader>
           <Heading>{heading}</Heading>
         </ModalHeader>

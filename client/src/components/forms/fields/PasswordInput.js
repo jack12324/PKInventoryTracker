@@ -1,6 +1,12 @@
-import { Button, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
+import {
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import PropTypes from "prop-types";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 function PasswordInput({ options, register }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,10 +20,15 @@ function PasswordInput({ options, register }) {
         /* eslint-disable-next-line react/jsx-props-no-spreading */
         {...register("password", options)}
       />
-      <InputRightElement w="5em">
-        <Button onClick={() => setShowPassword(!showPassword)} h="80%">
+      <InputRightElement pr={2}>
+        <IconButton
+          onClick={() => setShowPassword(!showPassword)}
+          h="80%"
+          icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
+          aria-label={showPassword ? "hide password" : "show password"}
+        >
           {showPassword ? "Hide" : "Show"}
-        </Button>
+        </IconButton>
       </InputRightElement>
     </InputGroup>
   );
