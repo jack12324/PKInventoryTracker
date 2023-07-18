@@ -36,7 +36,9 @@ function Cabinet({ cabinet }) {
   return (
     <Box p={2} shadow="md" borderWidth="1px" w="100%">
       <HStack justify="space-between">
-        <Text>{cabinet.name}</Text>
+        <Text noOfLines={2} maxW="50%">
+          {cabinet.name}
+        </Text>
         <HStack justify="space-between">
           <ShowHideIconButton onToggle={onToggle} isOpen={isOpen} />
           <EditButton name="Cabinet">

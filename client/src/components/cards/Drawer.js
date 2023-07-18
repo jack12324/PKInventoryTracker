@@ -38,7 +38,7 @@ function Drawer({ drawer }) {
   return (
     <Box p={2} shadow="md" borderWidth="1px" w="100%">
       <HStack justify="space-between">
-        <Text>
+        <Text maxW="50%" noOfLines={2}>
           {`Drawer ${drawer.position}`}
           {drawer.name ? ` - ${drawer.name}` : ""}
         </Text>

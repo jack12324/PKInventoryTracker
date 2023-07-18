@@ -20,7 +20,7 @@ Logo.propTypes = {
 };
 
 Logo.defaultProps = {
-  color: "brand.400",
+  color: "brand.500",
   w: 24,
   h: 12,
 };

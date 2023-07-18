@@ -32,7 +32,7 @@ function ConfirmAlert({
       onClose={onClose}
     >
       <AlertDialogOverlay />
-      <AlertDialogContent>
+      <AlertDialogContent w="95%">
         <AlertDialogHeader>{header}</AlertDialogHeader>
         <AlertDialogBody>{body}</AlertDialogBody>
         <AlertDialogFooter>
