@@ -6,6 +6,9 @@ import Cabinet from "../cards/Cabinet";
 
 function CabinetsPage() {
   const cabinets = useSelector((state) => state.cabinets);
+  const sortedCabinets = [...cabinets].sort((a, b) =>
+    a.name > b.name ? 1 : -1
+  );
 
   return (
     <>
@@ -15,7 +18,7 @@ function CabinetsPage() {
           <AddHandler addName="Cabinet">
             <ModalCabinetForm />
           </AddHandler>
-          {cabinets.map((c) => (
+          {sortedCabinets.map((c) => (
             <Cabinet key={c.id} cabinet={c} />
           ))}
         </VStack>
