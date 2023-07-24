@@ -170,6 +170,23 @@ describe("When some cabinets and users already exist", () => {
       const addedCabinet = await Cabinet.findOne({ name: newCabinet.name });
       expect(addedCabinet).toBeNull();
     });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+      const newCabinet = {
+        name: uuid(),
+      };
+      const response = await api
+        .post("/api/cabinets")
+        .send(newCabinet)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
+
+      const addedCabinet = await Cabinet.findOne({ name: newCabinet.name });
+      expect(addedCabinet).toBeNull();
+    });
   });
   describe("When deleting a cabinet", () => {
     test("Succeeds with 200, deletes cabinet and any drawers within the cabinet, and any items within those drawers", async () => {
@@ -269,6 +286,22 @@ describe("When some cabinets and users already exist", () => {
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("is not an admin");
+
+      const removedCabinet = await Cabinet.findOne({ name: cabinet.name });
+      expect(removedCabinet.name).toBe(cabinet.name);
+    });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const cabinets = helper.generateRandomCabinetData(5);
+      await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+      const cabinet = await helper.getRandomCabinetFrom(cabinets);
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+      const response = await api
+        .delete(`/api/cabinets/${cabinet.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
 
       const removedCabinet = await Cabinet.findOne({ name: cabinet.name });
       expect(removedCabinet.name).toBe(cabinet.name);
@@ -430,6 +463,25 @@ describe("When some cabinets and users already exist", () => {
       const updatedCabinet = await Cabinet.findById(cabinet._id);
       expect(updatedCabinet.name).toBe(cabinet.name);
     });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const cabinets = helper.generateRandomCabinetData(5);
+      await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+      const cabinet = await helper.getRandomCabinetFrom(cabinets);
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+      const newName = uuid();
+
+      const response = await api
+        .put(`/api/cabinets/${cabinet._id}`)
+        .send({ name: newName })
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
+
+      const updatedCabinet = await Cabinet.findById(cabinet._id);
+      expect(updatedCabinet.name).toBe(cabinet.name);
+    });
   });
   describe("getting cabinets", () => {
     test("Without a token returns 401 and a valid error message", async () => {
@@ -456,6 +508,19 @@ describe("When some cabinets and users already exist", () => {
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("malformed token");
+    });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const cabinets = helper.generateRandomCabinetData(5);
+      await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+
+      const response = await api
+        .get("/api/cabinets")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
     });
     test("with an admin token succeeds with 200 and list of cabinets", async () => {
       const cabinets = helper.generateRandomCabinetData(5);

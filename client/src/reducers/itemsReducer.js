@@ -34,7 +34,7 @@ export const initializeItems = () => async (dispatch) => {
     const items = await itemsService.getItems();
     dispatch(setItems(items));
   } catch (err) {
-    dispatch(setError(err.message, "GET ITEMS"));
+    dispatch(setError(err, "GET ITEMS"));
   }
 };
 

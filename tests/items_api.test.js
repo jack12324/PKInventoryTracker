@@ -194,6 +194,23 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const addedItem = await Item.findOne({ name: newItem.name });
       expect(addedItem).toBeNull();
     });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+      const newItem = {
+        name: uuid(),
+      };
+      const response = await api
+        .post("/api/items")
+        .send(newItem)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
+
+      const addedItem = await Item.findOne({ name: newItem.name });
+      expect(addedItem).toBeNull();
+    });
   });
   describe("When deleting an item", () => {
     test("Succeeds with 200, deletes item and removes item from drawer", async () => {
@@ -275,6 +292,20 @@ describe("When some cabinets, drawers, and users already exist", () => {
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("is not an admin");
+
+      const removedItem = await Item.findById(item._id);
+      expect(removedItem).toBeDefined();
+    });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const item = await helper.setupAndGetItemForTest();
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+      const response = await api
+        .delete(`/api/items/${item.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
 
       const removedItem = await Item.findById(item._id);
       expect(removedItem).toBeDefined();
@@ -457,6 +488,22 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const updatedItem = await Item.findById(item._id);
       expect(updatedItem.name).toEqual(item.name);
     });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const item = await helper.setupAndGetItemForTest();
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+
+      const response = await api
+        .put(`/api/items/${item._id}`)
+        .send({ name: uuid() })
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
+
+      const updatedItem = await Item.findById(item._id);
+      expect(updatedItem.name).toEqual(item.name);
+    });
   });
   describe("getting items", () => {
     test("Without a token returns 401 and a valid error message", async () => {
@@ -483,6 +530,19 @@ describe("When some cabinets, drawers, and users already exist", () => {
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("malformed token");
+    });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const cabinets = helper.generateRandomCabinetData(5, 1);
+      await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+
+      const response = await api
+        .get("/api/items")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
     });
     test("with an admin token succeeds with 200 and list of items", async () => {
       const cabinets = helper.generateRandomCabinetData(5, 1);

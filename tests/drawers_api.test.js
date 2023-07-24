@@ -176,6 +176,23 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const addedDrawer = await Drawer.findOne({ name: newDrawer.name });
       expect(addedDrawer).toBeNull();
     });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+      const newDrawer = {
+        name: uuid(),
+      };
+      const response = await api
+        .post("/api/drawers")
+        .send(newDrawer)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
+
+      const addedDrawer = await Drawer.findOne({ name: newDrawer.name });
+      expect(addedDrawer).toBeNull();
+    });
   });
   describe("When deleting a cabinet", () => {
     test("Succeeds with 200, deletes drawer and any items within drawer, removes drawer from cabinet", async () => {
@@ -260,6 +277,20 @@ describe("When some cabinets, drawers, and users already exist", () => {
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("is not an admin");
+
+      const removedDrawer = await Drawer.findById(drawer._id);
+      expect(removedDrawer).toBeDefined();
+    });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const drawer = await helper.setupAndGetDrawerForTest();
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+      const response = await api
+        .delete(`/api/drawers/${drawer.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
 
       const removedDrawer = await Drawer.findById(drawer._id);
       expect(removedDrawer).toBeDefined();
@@ -475,6 +506,22 @@ describe("When some cabinets, drawers, and users already exist", () => {
       const updatedDrawer = await Drawer.findById(drawer._id);
       expect(updatedDrawer.position).toEqual(drawer.position);
     });
+    test("With a non-admin token returns 403 and a valid error message", async () => {
+      const drawer = await helper.setupAndGetDrawerForTest();
+      const token = await helper.getRandomAdminTokenFrom(originalUsers, 0);
+
+      const response = await api
+        .put(`/api/drawers/${drawer._id}`)
+        .send({ position: 390 })
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
+
+      const updatedDrawer = await Drawer.findById(drawer._id);
+      expect(updatedDrawer.position).toEqual(drawer.position);
+    });
   });
   describe("getting drawers", () => {
     test("Without a token returns 401 and a valid error message", async () => {
@@ -501,6 +548,19 @@ describe("When some cabinets, drawers, and users already exist", () => {
         .expect("Content-Type", /application\/json/);
 
       expect(response.body.error).toContain("malformed token");
+    });
+    test("With a expired token returns 401 and a valid error message", async () => {
+      const cabinets = helper.generateRandomCabinetData(5, 1);
+      await Promise.all(cabinets.map((c) => helper.populateCabinet(c)));
+      const token = await helper.getRandomNonAdminTokenFrom(originalUsers, 0);
+
+      const response = await api
+        .get("/api/drawers")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(401)
+        .expect("Content-Type", /application\/json/);
+
+      expect(response.body.error).toContain("token expired");
     });
     test("with an admin token succeeds with 200 and list of drawers", async () => {
       const cabinets = helper.generateRandomCabinetData(5, 1);

@@ -4,6 +4,7 @@ import { clearCabinets, initializeCabinets } from "./cabinetsReducer";
 import tokenHelper from "../services/tokenHelper";
 import { clearDrawers, initializeDrawers } from "./drawersReducer";
 import { clearItems, initializeItems } from "./itemsReducer";
+import { setError } from "./errorReducer";
 
 const LSUSERKEY = "PKInventoryUser";
 
@@ -46,10 +47,15 @@ export const initializeUser = () => async (dispatch) => {
   if (localUser) {
     const user = JSON.parse(localUser);
     tokenHelper.setToken(user.token);
-    dispatch(initializeCabinets());
-    dispatch(initializeDrawers());
-    dispatch(initializeItems());
-    dispatch(setUser(user));
+    try {
+      await loginService.checkToken();
+      dispatch(initializeCabinets());
+      dispatch(initializeDrawers());
+      dispatch(initializeItems());
+      dispatch(setUser(user));
+    } catch (err) {
+      dispatch(setError(err, "INITIALIZE USER"));
+    }
   } else {
     dispatch(clearUser());
     dispatch(clearCabinets());
