@@ -6,12 +6,16 @@ const Cabinet = require("../models/cabinet");
 const Drawer = require("../models/drawer");
 const Item = require("../models/item");
 
-const getTokenForUser = (user) => {
+const getTokenForUser = (user, expiresInS = -1) => {
   const userForToken = {
     username: user.username,
     id: user._id,
   };
-  return jwt.sign(userForToken, process.env.SECRET);
+  return jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    expiresInS === -1 ? {} : { expiresIn: `${expiresInS}s` }
+  );
 };
 
 const generateUser = async (userData) => {
@@ -37,14 +41,14 @@ const getRandomUserOf = async (users, filter = () => true) => {
   return User.findOne({ username: userData.username });
 };
 
-const getRandomAdminTokenFrom = async (users) => {
+const getRandomAdminTokenFrom = async (users, expiresInS = -1) => {
   const user = await getRandomUserOf(users, (u) => u.admin);
-  return getTokenForUser(user);
+  return getTokenForUser(user, expiresInS);
 };
 
-const getRandomNonAdminTokenFrom = async (users) => {
+const getRandomNonAdminTokenFrom = async (users, expiresInS = -1) => {
   const user = await getRandomUserOf(users, (u) => !u.admin);
-  return getTokenForUser(user);
+  return getTokenForUser(user, expiresInS);
 };
 
 const getInvalidToken = async () => {

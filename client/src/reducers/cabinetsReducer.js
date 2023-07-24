@@ -47,11 +47,7 @@ export const initializeCabinets = () => async (dispatch) => {
     const cabinets = await cabinetsService.getCabinets();
     dispatch(setCabinets(cabinets));
   } catch (err) {
-    if (err.name === "AxiosError") {
-      dispatch(setError(err.response.data, "GET CABINETS"));
-    } else {
-      dispatch(setError(err, "GET CABINETS"));
-    }
+    dispatch(setError(err, "GET CABINETS"));
   }
 };
 

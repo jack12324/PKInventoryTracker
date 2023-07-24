@@ -87,7 +87,7 @@ export const createError = (err, area = "GENERAL") => {
     scope = "GENERAL";
   }
 
-  if (err.error?.message === "jwt expired") {
+  if (err.error === "token expired") {
     name = "JWT EXPIRED";
     message = "Your session has expired, please log in again";
     scope = "GENERAL";

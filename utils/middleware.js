@@ -64,6 +64,8 @@ const errorHandler = async (err, req, res, next) => {
       logger.error(`Unhandled Cast Error: ${err.message}`);
       res.status(400).send({ error: err.message });
     }
+  } else if (err.name === "TokenExpiredError") {
+    res.status(401).send({ error: "token expired" });
   } else {
     logger.error(`Unhandled Error: ${err}`);
     res.status(500).send({ error: err });

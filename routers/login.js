@@ -2,6 +2,7 @@ const loginRouter = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const middleware = require("../utils/middleware");
 
 loginRouter.post("/", async (req, res) => {
   const { username, password } = req.body;
@@ -32,10 +33,14 @@ loginRouter.post("/", async (req, res) => {
   const token = jwt.sign(
     { username: user.username, id: user._id },
     process.env.SECRET,
-    { expiresIn: "12h" }
+    { expiresIn: "12s" }
   );
 
   res.status(200).send({ token, username: user.username, admin: user.admin });
+});
+
+loginRouter.get("/", middleware.userExtractor, (req, res) => {
+  res.status(200).end();
 });
 
 module.exports = loginRouter;
